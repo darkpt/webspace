@@ -1,5 +1,800 @@
-<html>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>年齡區段分機群組表</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            margin: 15px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            border-top: 4px solid #667eea;
+        }
+        .summary-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .summary-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .content {
+            padding: 40px;
+        }
+        .age-group-container {
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border-left: 6px solid;
+        }
+        .age-group-header {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 2px solid #dee2e6;
+        }
+        .age-group-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .person-count {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            font-weight: normal;
+        }
+        .departments-grid {
+            padding: 30px;
+        }
+        .department-section {
+            margin-bottom: 25px;
+        }
+        .department-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            align-items: center;
+        }
+        .department-icon {
+            margin-right: 10px;
+            font-size: 1.3em;
+        }
+        .extensions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .extension-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .extension-card:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        .extension-number {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .extension-age {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .detailed-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .detailed-title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        .detail-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 8px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .detail-item {
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+        /* 年齡區段顏色 */
+        .age-25-29 { border-left-color: #ff6b6b; }
+        .age-25-29 .person-count { background: #ff6b6b; }
+        
+        .age-30-34 { border-left-color: #4ecdc4; }
+        .age-30-34 .person-count { background: #4ecdc4; }
+        
+        .age-35-39 { border-left-color: #45b7d1; }
+        .age-35-39 .person-count { background: #45b7d1; }
+        
+        .age-40-44 { border-left-color: #f39c12; }
+        .age-40-44 .person-count { background: #f39c12; }
+        
+        .age-45-49 { border-left-color: #e74c3c; }
+        .age-45-49 .person-count { background: #e74c3c; }
+        
+        .age-50-54 { border-left-color: #9b59b6; }
+        .age-50-54 .person-count { background: #9b59b6; }
+        
+        .age-55-59 { border-left-color: #34495e; }
+        .age-55-59 .person-count { background: #34495e; }
+        
+        .age-65-69 { border-left-color: #95a5a6; }
+        .age-65-69 .person-count { background: #95a5a6; }
+        
+        .no-data {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 20px;
+        }
+    </style>
+</head>
 <body>
-  Hello World
+    <div class="container">
+        <div class="header">
+            <h1>👥 按年齡區段分類的分機群組表</h1>
+            <p>詳細列出各年齡層員工的分機號碼分布情況（按年齡從小到大排序）</p>
+        </div>
+        
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-number">8</div>
+                <div class="summary-label">年齡區段</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number">65</div>
+                <div class="summary-label">總員工數</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number">21</div>
+                <div class="summary-label">最大群組人數</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-number">40-44歲</div>
+                <div class="summary-label">主要年齡層</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- 25-29歲 -->
+            <div class="age-group-container age-25-29">
+                <div class="age-group-header">
+                    <h2 class="age-group-title">
+                        25-29歲年齡層
+                        <span class="person-count">10人</span>
+                    </h2>
+                </div>
+                <div class="departments-grid">
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏢</span>總公司
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">分機14</div>
+                                <div class="extension-age">26歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機20</div>
+                                <div class="extension-age">29歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機37</div>
+                                <div class="extension-age">27歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機50</div>
+                                <div class="extension-age">27歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機58</div>
+                                <div class="extension-age">27歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機61</div>
+                                <div class="extension-age">27歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機71</div>
+                                <div class="extension-age">29歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機72</div>
+                                <div class="extension-age">29歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機79</div>
+                                <div class="extension-age">29歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機82</div>
+                                <div class="extension-age">28歲</div>
+                            </div>
+                        </div>
+                        <div class="detailed-info">
+                            <div class="detailed-title">📝 詳細生日資訊</div>
+                            <div class="detail-list">
+                                <div class="detail-item">分機14: 88/04/02</div>
+                                <div class="detail-item">分機20: 85/02/29</div>
+                                <div class="detail-item">分機37: 86/09/17</div>
+                                <div class="detail-item">分機50: 86/11/12</div>
+                                <div class="detail-item">分機58: 86/12/10</div>
+                                <div class="detail-item">分機61: 86/11/07</div>
+                                <div class="detail-item">分機71: 84/08/13</div>
+                                <div class="detail-item">分機72: 84/09/05</div>
+                                <div class="detail-item">分機79: 85/05/31</div>
+                                <div class="detail-item">分機82: 86/02/10</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 30-34歲 -->
+            <div class="age-group-container age-30-34">
+                <div class="age-group-header">
+                    <h2 class="age-group-title">
+                        30-34歲年齡層
+                        <span class="person-count">11人</span>
+                    </h2>
+                </div>
+                <div class="departments-grid">
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏢</span>總公司
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">分機12</div>
+                                <div class="extension-age">34歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機21</div>
+                                <div class="extension-age">32歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機30</div>
+                                <div class="extension-age">32歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機32</div>
+                                <div class="extension-age">30歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機56</div>
+                                <div class="extension-age">32歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機64</div>
+                                <div class="extension-age">32歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機66</div>
+                                <div class="extension-age">30歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機68</div>
+                                <div class="extension-age">34歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機85</div>
+                                <div class="extension-age">30歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機86</div>
+                                <div class="extension-age">31歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏭</span>新竹分部
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">新竹13</div>
+                                <div class="extension-age">31歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detailed-info">
+                        <div class="detailed-title">📝 詳細生日資訊</div>
+                        <div class="detail-list">
+                            <div class="detail-item">分機12: 79/09/23</div>
+                            <div class="detail-item">分機21: 82/05/15</div>
+                            <div class="detail-item">分機30: 81/12/22</div>
+                            <div class="detail-item">分機32: 84/05/01</div>
+                            <div class="detail-item">分機56: 81/08/12</div>
+                            <div class="detail-item">分機64: 82/06/07</div>
+                            <div class="detail-item">分機66: 84/03/06</div>
+                            <div class="detail-item">分機68: 80/01/05</div>
+                            <div class="detail-item">分機85: 83/10/06</div>
+                            <div class="detail-item">分機86: 82/11/21</div>
+                            <div class="detail-item">新竹13: 83/02/16</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 35-39歲 -->
+            <div class="age-group-container age-35-39">
+                <div class="age-group-header">
+                    <h2 class="age-group-title">
+                        35-39歲年齡層
+                        <span class="person-count">8人</span>
+                    </h2>
+                </div>
+                <div class="departments-grid">
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏢</span>總公司
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">分機13</div>
+                                <div class="extension-age">37歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機24</div>
+                                <div class="extension-age">36歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機54</div>
+                                <div class="extension-age">37歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機55</div>
+                                <div class="extension-age">38歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機63</div>
+                                <div class="extension-age">38歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機65</div>
+                                <div class="extension-age">39歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏭</span>新竹分部
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">新竹15</div>
+                                <div class="extension-age">37歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">新竹19</div>
+                                <div class="extension-age">35歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detailed-info">
+                        <div class="detailed-title">📝 詳細生日資訊</div>
+                        <div class="detail-list">
+                            <div class="detail-item">分機13: 76/09/29</div>
+                            <div class="detail-item">分機24: 77/12/30</div>
+                            <div class="detail-item">分機54: 77/06/26</div>
+                            <div class="detail-item">分機55: 75/10/15</div>
+                            <div class="detail-item">分機63: 75/09/29</div>
+                            <div class="detail-item">分機65: 75/05/25</div>
+                            <div class="detail-item">新竹15: 77/01/14</div>
+                            <div class="detail-item">新竹19: 78/10/12</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 40-44歲 -->
+            <div class="age-group-container age-40-44">
+                <div class="age-group-header">
+                    <h2 class="age-group-title">
+                        40-44歲年齡層 ⭐
+                        <span class="person-count">21人</span>
+                    </h2>
+                </div>
+                <div class="departments-grid">
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏢</span>總公司
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">分機15</div>
+                                <div class="extension-age">40歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機16</div>
+                                <div class="extension-age">43歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機19</div>
+                                <div class="extension-age">42歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機23</div>
+                                <div class="extension-age">43歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機25</div>
+                                <div class="extension-age">44歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機26</div>
+                                <div class="extension-age">40歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機27</div>
+                                <div class="extension-age">42歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機29</div>
+                                <div class="extension-age">41歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機33</div>
+                                <div class="extension-age">41歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機34</div>
+                                <div class="extension-age">43歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機39</div>
+                                <div class="extension-age">40歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機52</div>
+                                <div class="extension-age">40歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機57</div>
+                                <div class="extension-age">40歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機59</div>
+                                <div class="extension-age">41歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機60</div>
+                                <div class="extension-age">42歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機67</div>
+                                <div class="extension-age">40歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機84</div>
+                                <div class="extension-age">42歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏭</span>新竹分部
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">新竹11</div>
+                                <div class="extension-age">41歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏪</span>台南分部
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">台南11</div>
+                                <div class="extension-age">43歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">台南13</div>
+                                <div class="extension-age">42歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">⚖️</span>法務部
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">法18</div>
+                                <div class="extension-age">41歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detailed-info">
+                        <div class="detailed-title">📝 詳細生日資訊</div>
+                        <div class="detail-list">
+                            <div class="detail-item">分機15: 73/12/27</div>
+                            <div class="detail-item">分機16: 71/02/07</div>
+                            <div class="detail-item">分機19: 72/06/10</div>
+                            <div class="detail-item">分機23: 70/10/18</div>
+                            <div class="detail-item">分機25: 70/03/05</div>
+                            <div class="detail-item">分機26: 73/09/13</div>
+                            <div class="detail-item">分機27: 71/11/29</div>
+                            <div class="detail-item">分機29: 72/10/16</div>
+                            <div class="detail-item">分機33: 72/10/06</div>
+                            <div class="detail-item">分機34: 70/11/19</div>
+                            <div class="detail-item">分機39: 74/06/13</div>
+                            <div class="detail-item">分機52: 73/12/18</div>
+                            <div class="detail-item">分機57: 74/06/11</div>
+                            <div class="detail-item">分機59: 72/09/11</div>
+                            <div class="detail-item">分機60: 72/05/13</div>
+                            <div class="detail-item">分機67: 73/08/24</div>
+                            <div class="detail-item">分機84: 72/02/12</div>
+                            <div class="detail-item">新竹11: 73/07/04</div>
+                            <div class="detail-item">台南11: 71/03/09</div>
+                            <div class="detail-item">台南13: 72/06/05</div>
+                            <div class="detail-item">法18: 73/04/28</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 45-49歲 -->
+            <div class="age-group-container age-45-49">
+                <div class="age-group-header">
+                    <h2 class="age-group-title">
+                        45-49歲年齡層
+                        <span class="person-count">10人</span>
+                    </h2>
+                </div>
+                <div class="departments-grid">
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏢</span>總公司
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">分機17</div>
+                                <div class="extension-age">46歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機22</div>
+                                <div class="extension-age">45歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機31</div>
+                                <div class="extension-age">48歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機53</div>
+                                <div class="extension-age">49歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機69</div>
+                                <div class="extension-age">46歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機70</div>
+                                <div class="extension-age">48歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機74</div>
+                                <div class="extension-age">49歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機80</div>
+                                <div class="extension-age">46歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機83</div>
+                                <div class="extension-age">47歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏭</span>新竹分部
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">新竹10</div>
+                                <div class="extension-age">45歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detailed-info">
+                        <div class="detailed-title">📝 詳細生日資訊</div>
+                        <div class="detail-list">
+                            <div class="detail-item">分機17: 67/09/01</div>
+                            <div class="detail-item">分機22: 68/08/14</div>
+                            <div class="detail-item">分機31: 65/09/08</div>
+                            <div class="detail-item">分機53: 65/02/27</div>
+                            <div class="detail-item">分機69: 67/11/29</div>
+                            <div class="detail-item">分機70: 65/10/17</div>
+                            <div class="detail-item">分機74: 64/07/22</div>
+                            <div class="detail-item">分機80: 68/03/12</div>
+                            <div class="detail-item">分機83: 67/03/22</div>
+                            <div class="detail-item">新竹10: 68/08/10</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 50-54歲 -->
+            <div class="age-group-container age-50-54">
+                <div class="age-group-header">
+                    <h2 class="age-group-title">
+                        50-54歲年齡層
+                        <span class="person-count">2人</span>
+                    </h2>
+                </div>
+                <div class="departments-grid">
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏢</span>總公司
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">分機73</div>
+                                <div class="extension-age">50歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">⚖️</span>法務部
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">法88</div>
+                                <div class="extension-age">50歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detailed-info">
+                        <div class="detailed-title">📝 詳細生日資訊</div>
+                        <div class="detail-list">
+                            <div class="detail-item">分機73: 64/01/27</div>
+                            <div class="detail-item">法88: 64/02/15</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 55-59歲 -->
+            <div class="age-group-container age-55-59">
+                <div class="age-group-header">
+                    <h2 class="age-group-title">
+                        55-59歲年齡層
+                        <span class="person-count">2人</span>
+                    </h2>
+                </div>
+                <div class="departments-grid">
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏢</span>總公司
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">分機11</div>
+                                <div class="extension-age">58歲</div>
+                            </div>
+                            <div class="extension-card">
+                                <div class="extension-number">分機38</div>
+                                <div class="extension-age">55歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detailed-info">
+                        <div class="detailed-title">📝 詳細生日資訊</div>
+                        <div class="detail-list">
+                            <div class="detail-item">分機11: 56/01/05</div>
+                            <div class="detail-item">分機38: 59/04/13</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 65-69歲 -->
+            <div class="age-group-container age-65-69">
+                <div class="age-group-header">
+                    <h2 class="age-group-title">
+                        65-69歲年齡層
+                        <span class="person-count">1人</span>
+                    </h2>
+                </div>
+                <div class="departments-grid">
+                    <div class="department-section">
+                        <div class="department-name">
+                            <span class="department-icon">🏢</span>總公司
+                        </div>
+                        <div class="extensions-grid">
+                            <div class="extension-card">
+                                <div class="extension-number">分機35</div>
+                                <div class="extension-age">65歲</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detailed-info">
+                        <div class="detailed-title">📝 詳細生日資訊</div>
+                        <div class="detail-list">
+                            <div class="detail-item">分機35: 49/02/02</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

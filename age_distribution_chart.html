@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>員工年齡分布統計</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #4facfe;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4facfe;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .chart-container {
+            padding: 30px;
+            background: white;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        .chart-title {
+            text-align: center;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+        .age-detail {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .age-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .age-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .age-range {
+            font-weight: bold;
+            color: #4facfe;
+            font-size: 1.1em;
+        }
+        .age-count {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 公司員工年齡分布統計</h1>
+            <p>統計日期：2025年7月4日</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">65</div>
+                <div class="stat-label">總員工數</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">40.5</div>
+                <div class="stat-label">平均年齡（歲）</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">26-65</div>
+                <div class="stat-label">年齡範圍（歲）</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">40-44</div>
+                <div class="stat-label">最多年齡層（歲）</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">年齡分布直方圖</div>
+            <div class="chart-wrapper">
+                <canvas id="ageChart"></canvas>
+            </div>
+
+            <div class="age-detail">
+                <h3 style="margin-top: 0; color: #333;">📈 詳細年齡分布</h3>
+                <div class="age-list" id="ageList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 年齡分布資料
+        const ageData = [
+            {ageGroup: "25-29歲", count: 10},
+            {ageGroup: "30-34歲", count: 11},
+            {ageGroup: "35-39歲", count: 8},
+            {ageGroup: "40-44歲", count: 21},
+            {ageGroup: "45-49歲", count: 10},
+            {ageGroup: "50-54歲", count: 2},
+            {ageGroup: "55-59歲", count: 2},
+            {ageGroup: "65-69歲", count: 1}
+        ];
+
+        // 建立直方圖
+        const ctx = document.getElementById('ageChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ageData.map(item => item.ageGroup),
+                datasets: [{
+                    label: '人數',
+                    data: ageData.map(item => item.count),
+                    backgroundColor: [
+                        'rgba(79, 172, 254, 0.8)',
+                        'rgba(0, 242, 254, 0.8)',
+                        'rgba(102, 126, 234, 0.8)',
+                        'rgba(118, 75, 162, 0.8)',
+                        'rgba(255, 107, 107, 0.8)',
+                        'rgba(255, 159, 67, 0.8)',
+                        'rgba(72, 201, 176, 0.8)',
+                        'rgba(156, 136, 255, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(79, 172, 254, 1)',
+                        'rgba(0, 242, 254, 1)',
+                        'rgba(102, 126, 234, 1)',
+                        'rgba(118, 75, 162, 1)',
+                        'rgba(255, 107, 107, 1)',
+                        'rgba(255, 159, 67, 1)',
+                        'rgba(72, 201, 176, 1)',
+                        'rgba(156, 136, 255, 1)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            font: {
+                                size: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '人數',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '年齡層',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+        // 建立詳細列表
+        const ageList = document.getElementById('ageList');
+        ageData.forEach(item => {
+            const ageItem = document.createElement('div');
+            ageItem.className = 'age-item';
+            ageItem.innerHTML = `
+                <div class="age-range">${item.ageGroup}</div>
+                <div class="age-count">${item.count} 人</div>
+            `;
+            ageList.appendChild(ageItem);
+        });
+    </script>
+</body>
+</html>

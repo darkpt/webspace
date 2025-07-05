@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJI專利分類系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', SimHei, Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* 頂部導航欄 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid #0891b2;
+            z-index: 1000;
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(8, 145, 178, 0.3);
+        }
+
+        .nav-link:hover {
+            color: #00d4ff;
+            background: rgba(8, 145, 178, 0.2);
+            border-color: #00d4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);
+        }
+
+        /* 搜尋功能 */
+        .search-container {
+            margin-top: 120px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.5rem;
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(8, 145, 178, 0.3);
+            border-radius: 50px;
+            color: #e2e8f0;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #0891b2, #06b6d4);
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: linear-gradient(135deg, #06b6d4, #00d4ff);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        /* 統計面板 */
+        .stats-panel {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(8, 145, 178, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            min-width: 150px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        /* 主要內容區域 */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 120px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            border: 2px solid rgba(8, 145, 178, 0.4);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0891b2, #06b6d4, #00d4ff);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #00d4ff;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        }
+
+        .section-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .patent-count {
+            background: rgba(8, 145, 178, 0.2);
+            color: #00d4ff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        /* 專利卡片 */
+        .patents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .patent-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(8, 145, 178, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .patent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #0891b2, #06b6d4);
+            transition: width 0.3s ease;
+        }
+
+        .patent-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.15);
+            border-color: #00d4ff;
+        }
+
+        .patent-card:hover::before {
+            width: 100%;
+            opacity: 0.1;
+        }
+
+        .patent-number {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .patent-number:hover {
+            color: #0ef;
+            text-shadow: 0 0 10px rgba(0, 238, 255, 0.7);
+            transform: scale(1.05);
+        }
+
+        .patent-title {
+            font-size: 1rem;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .patent-applicant {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 6px;
+        }
+
+        .patent-classification {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .classification-tag {
+            background: rgba(8, 145, 178, 0.2);
+            color: #06b6d4;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .patent-description {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-height: 120px;
+            overflow: hidden;
+            position: relative;
+            transition: max-height 0.3s ease;
+        }
+
+        .patent-description.expanded {
+            max-height: none;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            color: #00d4ff;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            text-decoration: underline;
+        }
+
+        /* 回到頂部按鈕 */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #0891b2, #06b6d4);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 0.3s ease;
+            z-index: 999;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            background: linear-gradient(135deg, #06b6d4, #00d4ff);
+            transform: translateY(-5px) scale(1.1);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .nav-link {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .patents-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .stats-panel {
+                gap: 1rem;
+            }
+        }
+
+        /* 載入動畫 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* 搜尋高亮 */
+        .highlight {
+            background: rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        /* 無結果提示 */
+        .no-results {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 10px;
+            border: 1px solid rgba(8, 145, 178, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DJI 專利分類系統</div>
+            <div class="nav-links">
+                <a href="#section1" class="nav-link">導航與飛行控制</a>
+                <a href="#section2" class="nav-link">影像處理與視覺</a>
+                <a href="#section3" class="nav-link">無線通訊與網路</a>
+                <a href="#section4" class="nav-link">機械結構與硬體</a>
+                <a href="#section5" class="nav-link">感測器技術與姿態</a>
+                <a href="#section6" class="nav-link">電源管理與系統</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 搜尋功能 -->
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="搜尋專利號碼、標題或技術關鍵字..." id="searchInput">
+            <button class="search-btn" onclick="searchPatents()">🔍</button>
+        </div>
+    </div>
+
+    <!-- 統計面板 -->
+    <div class="stats-panel">
+        <div class="stat-card">
+            <div class="stat-number" id="totalPatents">36</div>
+            <div class="stat-label">總專利數</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">6</div>
+            <div class="stat-label">技術分類</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="visiblePatents">36</div>
+            <div class="stat-label">顯示專利</div>
+        </div>
+    </div>
+
+    <!-- 主要內容 -->
+    <div class="main-content">
+        <!-- 導航與飛行控制系統 -->
+        <section class="section" id="section1">
+            <div class="section-header">
+                <h2 class="section-title">導航與飛行控制系統</h2>
+                <div class="section-stats">
+                    <span class="patent-count">10 筆專利</span>
+                </div>
+            </div>
+            <div class="patents-grid" id="patents-section1">
+                <!-- 專利卡片將由JavaScript動態生成 -->
+            </div>
+        </section>
+
+        <!-- 影像處理與視覺系統 -->
+        <section class="section" id="section2">
+            <div class="section-header">
+                <h2 class="section-title">影像處理與視覺系統</h2>
+                <div class="section-stats">
+                    <span class="patent-count">6 筆專利</span>
+                </div>
+            </div>
+            <div class="patents-grid" id="patents-section2">
+                <!-- 專利卡片將由JavaScript動態生成 -->
+            </div>
+        </section>
+
+        <!-- 無線通訊與網路技術 -->
+        <section class="section" id="section3">
+            <div class="section-header">
+                <h2 class="section-title">無線通訊與網路技術</h2>
+                <div class="section-stats">
+                    <span class="patent-count">3 筆專利</span>
+                </div>
+            </div>
+            <div class="patents-grid" id="patents-section3">
+                <!-- 專利卡片將由JavaScript動態生成 -->
+            </div>
+        </section>
+
+        <!-- 機械結構與硬體設計 -->
+        <section class="section" id="section4">
+            <div class="section-header">
+                <h2 class="section-title">機械結構與硬體設計</h2>
+                <div class="section-stats">
+                    <span class="patent-count">11 筆專利</span>
+                </div>
+            </div>
+            <div class="patents-grid" id="patents-section4">
+                <!-- 專利卡片將由JavaScript動態生成 -->
+            </div>
+        </section>
+
+        <!-- 感測器技術與姿態穩定 -->
+        <section class="section" id="section5">
+            <div class="section-header">
+                <h2 class="section-title">感測器技術與姿態穩定</h2>
+                <div class="section-stats">
+                    <span class="patent-count">2 筆專利</span>
+                </div>
+            </div>
+            <div class="patents-grid" id="patents-section5">
+                <!-- 專利卡片將由JavaScript動態生成 -->
+            </div>
+        </section>
+
+        <!-- 電源管理與系統整合 -->
+        <section class="section" id="section6">
+            <div class="section-header">
+                <h2 class="section-title">電源管理與系統整合</h2>
+                <div class="section-stats">
+                    <span class="patent-count">4 筆專利</span>
+                </div>
+            </div>
+            <div class="patents-grid" id="patents-section6">
+                <!-- 專利卡片將由JavaScript動態生成 -->
+            </div>
+        </section>
+    </div>
+
+    <!-- 回到頂部按鈕 -->
+    <button class="back-to-top" onclick="scrollToTop()">↑</button>
+
+    <script>
+        // 專利資料
+        const patentData = {
+            'section1': [
+                {
+                    number: 'US7228232B2',
+                    title: 'NAVIGATING A UAV WITH OBSTACLE AVOIDANCE ALGORITHMS',
+                    applicant: 'International Business Machines Corp',
+                    classification: ['無人機導航', 'GPS定位', '障礙物偵測', '3D視覺化', '迴避演算法', 'GUI地圖座標映射'],
+                    description: '解決課題：傳統無人飛行載具（UAV）多依賴人工操作，缺乏自動導航及障礙物迴避能力，導致操作複雜且風險高。需解決如何自動導航UAV並有效識別及避開飛行路徑上的障礙物，包括三維實體障礙與禁航區域。\n採用技術：提供一套方法、系統與電腦程式產品，透過搭載於UAV上的導航電腦，執行導航演算法，自動化地從起始點飛往一或多個航點（waypoints）。核心技術包含：1.利用GPS接收器持續讀取UAV位置資料。2.預測未來位置以判斷前方是否存在障礙物。3.從資料庫檢索或透過3D電腦圖形描繪預期航跡來識別障礙物。4.選擇適當的障礙物迴避演算法調整航向、航點及高度。'
+                },
+                {
+                    number: 'US7286913B2',
+                    title: 'NAVIGATING A UAV WITH TELEMETRY THROUGH A SOCKET',
+                    applicant: 'International Business Machines Corp',
+                    classification: ['無人飛行載具', 'UAV導航', 'GUI地圖像素選擇', '遙測通訊', 'Socket通信', 'GPS定位'],
+                    description: '解決課題：傳統無人飛行載具（UAV）導航多依賴人工操作，操作者需掌握起始位置、當前位置及航點資訊，且缺乏自動化輔助，導致操作複雜且效率低。\n採用技術：本發明提出一種基於圖形使用者介面（GUI）地圖像素選擇的UAV導航方法。操作者可透過單一介面操作（如滑鼠點擊或搖桿按鍵），選取顯示地球表面的GUI地圖像素，該像素對應特定航點座標。'
+                },
+                {
+                    number: 'US7418320B1',
+                    title: 'NAVIGATING A UAV HAVING AN ON-BOARD DIGITAL CAMERA TO CAPTURE DESIRED GEOGRAPHIC AREA',
+                    applicant: 'International Business Machines Corp',
+                    classification: ['無人飛行載具', 'UAV導航', '數位攝影機', 'GPS定位', 'GUI地圖像素映射', '航點規劃'],
+                    description: '解決

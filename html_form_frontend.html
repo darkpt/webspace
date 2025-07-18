@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google 文件處理工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input[type="url"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input[type="url"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        .form-group input[type="url"].error {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .example {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .example h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .example code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 Google 文件處理工具</h1>
+            <p>自動處理 Google Sheets 與 Google Docs 之間的文字替換</p>
+        </div>
+
+        <div class="example">
+            <h3>📋 使用說明</h3>
+            <p><strong>Google Sheets 格式：</strong></p>
+            <p>• A欄：要被替換的原始文字</p>
+            <p>• B欄：要添加的補充內容</p>
+            <p><strong>Google Docs 要求：</strong></p>
+            <p>• 文件中必須包含 <code>【實施方式】</code> 和 <code>【符號說明】</code> 段落標記</p>
+        </div>
+
+        <form id="documentForm">
+            <div class="form-group">
+                <label for="spreadsheetUrl">📊 Google Sheets URL</label>
+                <input 
+                    type="url" 
+                    id="spreadsheetUrl" 
+                    name="spreadsheetUrl" 
+                    required 
+                    placeholder="https://docs.google.com/spreadsheets/d/..."
+                >
+                <div class="help-text">請輸入包含替換資料的 Google Sheets 分享連結</div>
+            </div>
+
+            <div class="form-group">
+                <label for="docUrl">📝 Google Docs URL</label>
+                <input 
+                    type="url" 
+                    id="docUrl" 
+                    name="docUrl" 
+                    required 
+                    placeholder="https://docs.google.com/document/d/..."
+                >
+                <div class="help-text">請輸入要進行文字替換的 Google Docs 分享連結</div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                🚀 開始處理文件
+            </button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在處理文件，請稍候...</p>
+        </div>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // GAS 部署 URL - 請替換為您的實際 GAS URL
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTv298BMdM5SiPriVKhqLewuQKVKSes96inFej9LEmpW3pgp00YLbQCJEJA3HSDpGCQw/exec';
+
+        const form = document.getElementById('documentForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const spreadsheetInput = document.getElementById('spreadsheetUrl');
+        const docInput = document.getElementById('docUrl');
+
+        // 表單提交處理
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // 重置UI狀態
+            hideResult();
+            clearInputErrors();
+            
+            // 驗證輸入
+            if (!validateInputs()) {
+                return;
+            }
+            
+            // 顯示載入狀態
+            showLoading();
+            
+            try {
+                // 準備表單資料
+                const formData = new FormData();
+                formData.append('spreadsheetUrl', spreadsheetInput.value.trim());
+                formData.append('docUrl', docInput.value.trim());
+                
+                // 發送請求到 GAS
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // 顯示結果
+                if (data.success) {
+                    showResult('success', data.message, data.details);
+                } else {
+                    showResult('error', data.message);
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showResult('error', `連線錯誤：${error.message}`);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // 輸入驗證
+        function validateInputs() {
+            let isValid = true;
+            
+            if (!isValidGoogleSheetsUrl(spreadsheetInput.value.trim())) {
+                showInputError(spreadsheetInput, '請輸入有效的 Google Sheets URL');
+                isValid = false;
+            }
+            
+            if (!isValidGoogleDocsUrl(docInput.value.trim())) {
+                showInputError(docInput, '請輸入有效的 Google Docs URL');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        // 驗證 Google Sheets URL
+        function isValidGoogleSheetsUrl(url) {
+            const pattern = /^https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+/;
+            return pattern.test(url);
+        }
+
+        // 驗證 Google Docs URL
+        function isValidGoogleDocsUrl(url) {
+            const pattern = /^https:\/\/docs\.google\.com\/document\/d\/[a-zA-Z0-9-_]+/;
+            return pattern.test(url);
+        }
+
+        // 顯示輸入錯誤
+        function showInputError(input, message) {
+            input.classList.add('error');
+            
+            // 移除舊的錯誤訊息
+            const existingError = input.parentNode.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // 添加新的錯誤訊息
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'help-text error-message';
+            errorDiv.style.color = '#e74c3c';
+            errorDiv.textContent = message;
+            input.parentNode.appendChild(errorDiv);
+        }
+
+        // 清除輸入錯誤
+        function clearInputErrors() {
+            [spreadsheetInput, docInput].forEach(input => {
+                input.classList.remove('error');
+                const errorMessage = input.parentNode.querySelector('.error-message');
+                if (errorMessage) {
+                    errorMessage.remove();
+                }
+            });
+        }
+
+        // 顯示載入狀態
+        function showLoading() {
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            result.style.display = 'none';
+        }
+
+        // 隱藏載入狀態
+        function hideLoading() {
+            submitBtn.disabled = false;
+            loading.style.display = 'none';
+        }
+
+        // 顯示結果
+        function showResult(type, message, details = null) {
+            result.className = `result ${type}`;
+            
+            let content = `<strong>${message}</strong>`;
+            
+            if (details && type === 'success') {
+                content += `
+                    <br><br>
+                    <div style="font-size: 14px;">
+                        📊 處理統計：<br>
+                        • 處理行數：${details.processedRows} 行<br>
+                        • 替換次數：${details.replacementCount} 次
+                    </div>
+                `;
+            }
+            
+            result.innerHTML = content;
+            result.style.display = 'block';
+        }
+
+        // 隱藏結果
+        function hideResult() {
+            result.style.display = 'none';
+        }
+
+        // 輸入框即時驗證
+        [spreadsheetInput, docInput].forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.classList.contains('error')) {
+                    this.classList.remove('error');
+                    const errorMessage = this.parentNode.querySelector('.error-message');
+                    if (errorMessage) {
+                        errorMessage.remove();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

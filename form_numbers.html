@@ -58,7 +58,7 @@
             font-size: 14px;
         }
 
-        .form-group input[type="url"] {
+        .form-group input[type="text"] {
             width: 100%;
             padding: 12px 16px;
             border: 2px solid #e1e5e9;
@@ -66,15 +66,16 @@
             font-size: 16px;
             transition: border-color 0.3s ease;
             background: #f8f9fa;
+            font-family: 'Courier New', monospace;
         }
 
-        .form-group input[type="url"]:focus {
+        .form-group input[type="text"]:focus {
             outline: none;
             border-color: #667eea;
             background: white;
         }
 
-        .form-group input[type="url"].error {
+        .form-group input[type="text"].error {
             border-color: #e74c3c;
             background: #fdf2f2;
         }
@@ -194,31 +195,38 @@
             <p>• B欄：要添加的補充內容</p>
             <p><strong>Google Docs 要求：</strong></p>
             <p>• 文件中必須包含 <code>【實施方式】</code> 和 <code>【符號說明】</code> 段落標記</p>
+            <p><strong>如何取得 ID：</strong></p>
+            <p>• 從 URL 中提取 ID 部分</p>
+            <p>• 範例：<code>https://docs.google.com/spreadsheets/d/<strong>1Ra6nCigMRMw3SajFgaYXinpFLqhmZ-Vtab1WJCGm1kY</strong>/edit</code></p>
         </div>
 
         <form id="documentForm">
             <div class="form-group">
-                <label for="spreadsheetUrl">📊 Google Sheets URL</label>
+                <label for="spreadsheetId">📊 Google Sheets ID</label>
                 <input 
-                    type="url" 
-                    id="spreadsheetUrl" 
-                    name="spreadsheetUrl" 
+                    type="text" 
+                    id="spreadsheetId" 
+                    name="spreadsheetId" 
                     required 
-                    placeholder="https://docs.google.com/spreadsheets/d/..."
+                    placeholder="1Ra6nCigMRMw3SajFgaYXinpFLqhmZ-Vtab1WJCGm1kY"
+                    pattern="[a-zA-Z0-9-_]+"
+                    title="請輸入有效的 Google Sheets ID（僅包含字母、數字、連字號和底線）"
                 >
-                <div class="help-text">請輸入包含替換資料的 Google Sheets 分享連結</div>
+                <div class="help-text">請輸入 Google Sheets 的文件 ID（從 URL 中的 /d/ 後面部分提取）</div>
             </div>
 
             <div class="form-group">
-                <label for="docUrl">📝 Google Docs URL</label>
+                <label for="docId">📝 Google Docs ID</label>
                 <input 
-                    type="url" 
-                    id="docUrl" 
-                    name="docUrl" 
+                    type="text" 
+                    id="docId" 
+                    name="docId" 
                     required 
-                    placeholder="https://docs.google.com/document/d/..."
+                    placeholder="1_eLTIUz1w4xk0QvaJy_LhN7cWw8r2cbf3sdG-kkQVFU"
+                    pattern="[a-zA-Z0-9-_]+"
+                    title="請輸入有效的 Google Docs ID（僅包含字母、數字、連字號和底線）"
                 >
-                <div class="help-text">請輸入要進行文字替換的 Google Docs 分享連結</div>
+                <div class="help-text">請輸入 Google Docs 的文件 ID（從 URL 中的 /d/ 後面部分提取）</div>
             </div>
 
             <button type="submit" class="submit-btn" id="submitBtn">
@@ -236,14 +244,14 @@
 
     <script>
         // GAS 部署 URL - 請替換為您的實際 GAS URL
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTv298BMdM5SiPriVKhqLewuQKVKSes96inFej9LEmpW3pgp00YLbQCJEJA3HSDpGCQw/exec';
+        const GAS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
 
         const form = document.getElementById('documentForm');
         const submitBtn = document.getElementById('submitBtn');
         const loading = document.getElementById('loading');
         const result = document.getElementById('result');
-        const spreadsheetInput = document.getElementById('spreadsheetUrl');
-        const docInput = document.getElementById('docUrl');
+        const spreadsheetInput = document.getElementById('spreadsheetId');
+        const docInput = document.getElementById('docId');
 
         // 表單提交處理
         form.addEventListener('submit', async function(e) {
@@ -264,8 +272,8 @@
             try {
                 // 準備表單資料
                 const formData = new FormData();
-                formData.append('spreadsheetUrl', spreadsheetInput.value.trim());
-                formData.append('docUrl', docInput.value.trim());
+                formData.append('spreadsheetId', spreadsheetInput.value.trim());
+                formData.append('docId', docInput.value.trim());
                 
                 // 發送請求到 GAS
                 const response = await fetch(GAS_URL, {
@@ -298,29 +306,24 @@
         function validateInputs() {
             let isValid = true;
             
-            if (!isValidGoogleSheetsUrl(spreadsheetInput.value.trim())) {
-                showInputError(spreadsheetInput, '請輸入有效的 Google Sheets URL');
+            if (!isValidGoogleId(spreadsheetInput.value.trim())) {
+                showInputError(spreadsheetInput, '請輸入有效的 Google Sheets ID');
                 isValid = false;
             }
             
-            if (!isValidGoogleDocsUrl(docInput.value.trim())) {
-                showInputError(docInput, '請輸入有效的 Google Docs URL');
+            if (!isValidGoogleId(docInput.value.trim())) {
+                showInputError(docInput, '請輸入有效的 Google Docs ID');
                 isValid = false;
             }
             
             return isValid;
         }
 
-        // 驗證 Google Sheets URL
-        function isValidGoogleSheetsUrl(url) {
-            const pattern = /^https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+/;
-            return pattern.test(url);
-        }
-
-        // 驗證 Google Docs URL
-        function isValidGoogleDocsUrl(url) {
-            const pattern = /^https:\/\/docs\.google\.com\/document\/d\/[a-zA-Z0-9-_]+/;
-            return pattern.test(url);
+        // 驗證 Google 文件 ID 格式
+        function isValidGoogleId(id) {
+            // Google 文件 ID 通常包含字母、數字、連字號和底線，長度約 40-50 字元
+            const pattern = /^[a-zA-Z0-9-_]{25,}$/;
+            return pattern.test(id) && id.length >= 25;
         }
 
         // 顯示輸入錯誤
@@ -377,7 +380,9 @@
                     <div style="font-size: 14px;">
                         📊 處理統計：<br>
                         • 處理行數：${details.processedRows} 行<br>
-                        • 替換次數：${details.replacementCount} 次
+                        • 替換次數：${details.replacementCount} 次<br>
+                        • Sheets ID：${details.spreadsheetId}<br>
+                        • Docs ID：${details.docId}
                     </div>
                 `;
             }

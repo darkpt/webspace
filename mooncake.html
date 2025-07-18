@@ -2,8 +2,17 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>月餅訂購系統 - 正在跳轉...</title>
+    
+    <!-- 強制UTF-8編碼 -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
+    <!-- 預載入Google字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- 自動重導向 -->
     <meta http-equiv="refresh" content="3;url=" id="metaRefresh">
@@ -21,14 +30,15 @@
     <meta property="og:title" content="月餅訂購系統">
     <meta property="og:description" content="2025年中秋節月餅團購訂購系統">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://darkpt.github.io/webspace/mooncake.html">
+    <meta property="og:url" content="YOUR_GITHUB_PAGES_URL">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     
     <style>
+        /* 確保字體正確載入 */
         body {
-            font-family: 'Microsoft JhengHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', 'PingFang TC', 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #bbdefb 100%);
             margin: 0;
             padding: 0;
@@ -37,6 +47,16 @@
             justify-content: center;
             align-items: center;
             color: #1976d2;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        
+        /* 防止文字閃爍 */
+        * {
+            -webkit-font-feature-settings: "kern";
+            font-feature-settings: "kern";
+            text-rendering: optimizeLegibility;
         }
         
         .container {
@@ -49,6 +69,8 @@
             border: 2px solid rgba(25, 118, 210, 0.1);
             max-width: 500px;
             width: 90%;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
         }
         
         .logo {
@@ -63,20 +85,28 @@
             font-size: 2.5em;
             color: white;
             box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
+            line-height: 1;
+        }
+        
+        .logo::before {
+            content: "🥮";
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
         }
         
         h1 {
             font-size: 2.5em;
             margin: 0 0 20px 0;
-            font-weight: bold;
+            font-weight: 700;
             color: #1976d2;
             text-shadow: 1px 1px 2px rgba(25, 118, 210, 0.1);
+            letter-spacing: 0.5px;
         }
         
         .subtitle {
             font-size: 1.2em;
             margin: 0 0 40px 0;
             color: #555;
+            font-weight: 400;
         }
         
         .loading-section {
@@ -101,6 +131,7 @@
         .loading-text {
             font-size: 1.1em;
             color: #666;
+            font-weight: 400;
         }
         
         .manual-link {
@@ -113,6 +144,7 @@
             margin: 0 0 15px 0;
             font-size: 0.9em;
             color: #666;
+            font-weight: 400;
         }
         
         .btn {
@@ -123,9 +155,10 @@
             border: 2px solid #2196f3;
             border-radius: 25px;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 500;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(25, 118, 210, 0.2);
+            font-family: inherit;
         }
         
         .btn:hover {
@@ -139,9 +172,10 @@
         
         .countdown {
             font-size: 1.5em;
-            font-weight: bold;
+            font-weight: 700;
             color: #2196f3;
             text-shadow: 1px 1px 2px rgba(25, 118, 210, 0.2);
+            font-family: 'Noto Sans TC', monospace;
         }
         
         .info-section {
@@ -149,6 +183,7 @@
             font-size: 0.9em;
             color: #666;
             line-height: 1.6;
+            font-weight: 400;
         }
         
         .info-section p {
@@ -176,10 +211,6 @@
         }
         
         /* 動畫效果 */
-        .fade-in {
-            animation: fadeIn 1s ease-in;
-        }
-        
         @keyframes fadeIn {
             from { 
                 opacity: 0; 
@@ -190,11 +221,22 @@
                 transform: translateY(0);
             }
         }
+        
+        /* 防止載入時文字跳動 */
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        
+        /* 確保emoji正確顯示 */
+        .emoji {
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", sans-serif;
+            font-style: normal;
+        }
     </style>
 </head>
 <body>
-    <div class="container fade-in">
-        <div class="logo">?</div>
+    <div class="container">
+        <div class="logo"></div>
         
         <h1>月餅訂購系統</h1>
         <p class="subtitle">2025年中秋節團購</p>
@@ -206,9 +248,9 @@
         </div>
         
         <div class="info-section">
-            <p>✨ 多種精緻月餅禮盒選擇</p>
-            <p>📱 手機電腦都能輕鬆訂購</p>
-            <p> 每人補助 NT$ 700</p>
+            <p><span class="emoji">✨</span> 多種精緻月餅禮盒選擇</p>
+            <p><span class="emoji">📱</span> 手機電腦都能輕鬆訂購</p>
+            <p><span class="emoji">🎯</span> 建議個人訂購金額不超過 NT$ 700</p>
         </div>
         
         <div class="manual-link">
@@ -221,9 +263,9 @@
 
     <script>
         // ========================================
-        // ? 設定區域 - 請在此修改您的GAS Web App URL
+        // 🔧 設定區域 - 請在此修改您的GAS Web App URL
         // ========================================
-        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxdN4pLVI7egnCfncQW0To2Ee1vY7XkcbIIYhMf0KZfCjzFU2MSFA-ZK8NZbVGNvBtA/exec';
+        const GAS_WEB_APP_URL = 'AKfycbxdN4pLVI7egnCfncQW0To2Ee1vY7XkcbIIYhMf0KZfCjzFU2MSFA-ZK8NZbVGNvBtA';
         
         // ========================================
         // 初始化設定

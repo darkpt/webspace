@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>井字遊戲</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        
+        .game-container {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px auto;
+            background-color: #333;
+            padding: 5px;
+            border-radius: 10px;
+        }
+        
+        .cell {
+            background-color: white;
+            border: none;
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-radius: 5px;
+        }
+        
+        .cell:hover:not(.taken) {
+            background-color: #f0f0f0;
+        }
+        
+        .cell.taken {
+            cursor: not-allowed;
+        }
+        
+        .cell.x {
+            color: #e74c3c;
+        }
+        
+        .cell.o {
+            color: #3498db;
+        }
+        
+        .game-info {
+            margin: 20px 0;
+        }
+        
+        .current-player {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .game-status {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+            min-height: 25px;
+        }
+        
+        .winner {
+            color: #27ae60;
+        }
+        
+        .draw {
+            color: #f39c12;
+        }
+        
+        .reset-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 15px;
+            transition: background-color 0.2s;
+        }
+        
+        .reset-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .score {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .score-item {
+            text-align: center;
+        }
+        
+        .score-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>井字遊戲</h1>
+        
+        <div class="game-info">
+            <div class="current-player">當前玩家: <span id="currentPlayer" style="color: #e74c3c;">X</span></div>
+            <div class="game-status" id="gameStatus"></div>
+        </div>
+        
+        <div class="game-board" id="gameBoard">
+            <button class="cell" data-index="0"></button>
+            <button class="cell" data-index="1"></button>
+            <button class="cell" data-index="2"></button>
+            <button class="cell" data-index="3"></button>
+            <button class="cell" data-index="4"></button>
+            <button class="cell" data-index="5"></button>
+            <button class="cell" data-index="6"></button>
+            <button class="cell" data-index="7"></button>
+            <button class="cell" data-index="8"></button>
+        </div>
+        
+        <button class="reset-btn" onclick="resetGame()">重新開始</button>
+        
+        <div class="score">
+            <div class="score-item">
+                <div class="score-label">玩家 X</div>
+                <div class="score-value" id="scoreX">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">平手</div>
+                <div class="score-value" id="scoreDraw">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">玩家 O</div>
+                <div class="score-value" id="scoreO">0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = true;
+        let scores = { X: 0, O: 0, draw: 0 };
+
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        const cells = document.querySelectorAll('.cell');
+        const currentPlayerElement = document.getElementById('currentPlayer');
+        const gameStatusElement = document.getElementById('gameStatus');
+        const scoreXElement = document.getElementById('scoreX');
+        const scoreOElement = document.getElementById('scoreO');
+        const scoreDrawElement = document.getElementById('scoreDraw');
+
+        function handleCellClick(event) {
+            const clickedCell = event.target;
+            const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+            if (gameBoard[clickedCellIndex] !== '' || !gameActive) {
+                return;
+            }
+
+            gameBoard[clickedCellIndex] = currentPlayer;
+            clickedCell.textContent = currentPlayer;
+            clickedCell.classList.add('taken', currentPlayer.toLowerCase());
+
+            if (checkWin()) {
+                gameStatusElement.textContent = `玩家 ${currentPlayer} 獲勝！`;
+                gameStatusElement.className = 'game-status winner';
+                scores[currentPlayer]++;
+                updateScoreDisplay();
+                gameActive = false;
+                return;
+            }
+
+            if (checkDraw()) {
+                gameStatusElement.textContent = '平手！';
+                gameStatusElement.className = 'game-status draw';
+                scores.draw++;
+                updateScoreDisplay();
+                gameActive = false;
+                return;
+            }
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            currentPlayerElement.textContent = currentPlayer;
+            currentPlayerElement.style.color = currentPlayer === 'X' ? '#e74c3c' : '#3498db';
+        }
+
+        function checkWin() {
+            return winningConditions.some(condition => {
+                return condition.every(index => {
+                    return gameBoard[index] === currentPlayer;
+                });
+            });
+        }
+
+        function checkDraw() {
+            return gameBoard.every(cell => cell !== '');
+        }
+
+        function resetGame() {
+            currentPlayer = 'X';
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+            gameStatusElement.textContent = '';
+            gameStatusElement.className = 'game-status';
+            currentPlayerElement.textContent = 'X';
+            currentPlayerElement.style.color = '#e74c3c';
+
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('taken', 'x', 'o');
+            });
+        }
+
+        function updateScoreDisplay() {
+            scoreXElement.textContent = scores.X;
+            scoreOElement.textContent = scores.O;
+            scoreDrawElement.textContent = scores.draw;
+        }
+
+        cells.forEach(cell => {
+            cell.addEventListener('click', handleCellClick);
+        });
+    </script>
+</body>
+</html>

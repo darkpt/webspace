@@ -1,9 +1,520 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
-  <title>Redirecting...</title>
-  <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbxQmb3E2HVhWMzUvfsdsaGkikJ_w88th8SRPxJnOge-5efazGxtOxG4_QlrVKX4NOVK/exec">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>員工生日月份分布統計</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 50%, #4ecdc4 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-top: 5px solid #ff6b6b;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 1em;
+            font-weight: 500;
+        }
+        .charts-container {
+            padding: 40px;
+            background: white;
+        }
+        .chart-section {
+            margin-bottom: 40px;
+        }
+        .chart-title {
+            text-align: center;
+            font-size: 1.6em;
+            margin-bottom: 25px;
+            color: #333;
+            font-weight: 600;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        .monthly-details {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        .months-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .month-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 6px solid #4ecdc4;
+        }
+        .month-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .month-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+        }
+        .month-count {
+            background: #4ecdc4;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .birthday-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .birthday-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #555;
+            border: 1px solid #e9ecef;
+        }
+        .highlight-max {
+            border-left-color: #ff6b6b !important;
+        }
+        .highlight-max .month-count {
+            background: #ff6b6b;
+        }
+        .highlight-min {
+            border-left-color: #ffa500 !important;
+        }
+        .highlight-min .month-count {
+            background: #ffa500;
+        }
+        .season-analysis {
+            margin-top: 30px;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .season-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .season-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+        }
+        .spring { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+        .summer { background: linear-gradient(135deg, #ffa500, #ff6b6b); }
+        .autumn { background: linear-gradient(135deg, #ff6b6b, #c44569); }
+        .winter { background: linear-gradient(135deg, #667eea, #764ba2); }
+    </style>
 </head>
 <body>
-  </body>
+    <div class="container">
+        <div class="header">
+            <h1>🎂 員工生日月份分布統計</h1>
+            <p>掌握每月生日慶祝活動規劃 | 統計日期：2025年7月4日</p>
+        </div>
+        
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number">65</div>
+                <div class="stat-label">總員工數</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">九月</div>
+                <div class="stat-label">生日最多月份（9人）</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">七月</div>
+                <div class="stat-label">生日最少月份（2人）</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">5.4</div>
+                <div class="stat-label">每月平均生日人數</div>
+            </div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-section">
+                <div class="chart-title">📊 月份生日分布柱狀圖</div>
+                <div class="chart-wrapper">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-title">🥧 月份生日分布圓餅圖</div>
+                <div class="chart-wrapper">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+
+            <div class="monthly-details">
+                <h3 style="margin-top: 0; color: #333; text-align: center;">📅 各月份詳細生日清單</h3>
+                <div class="months-grid" id="monthsGrid"></div>
+            </div>
+
+            <div class="season-analysis">
+                <h3 style="margin-top: 0; color: #333; text-align: center;">🌸 季節性生日分布</h3>
+                <div class="season-grid" id="seasonGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 月份生日資料
+        const monthlyData = [
+            {month: '一月', count: 4, details: [
+                {extension: '11', birthday: '56/01/05'},
+                {extension: '68', birthday: '80/01/05'},
+                {extension: '73', birthday: '64/01/27'},
+                {extension: '新竹15', birthday: '77/01/14'}
+            ]},
+            {month: '二月', count: 8, details: [
+                {extension: '35', birthday: '49/02/02'},
+                {extension: '53', birthday: '65/02/27'},
+                {extension: '16', birthday: '71/02/07'},
+                {extension: '84', birthday: '72/02/12'},
+                {extension: '82', birthday: '86/02/10'},
+                {extension: '20', birthday: '85/02/29'},
+                {extension: '新竹13', birthday: '83/02/16'},
+                {extension: '法88', birthday: '64/02/15'}
+            ]},
+            {month: '三月', count: 5, details: [
+                {extension: '80', birthday: '68/03/12'},
+                {extension: '25', birthday: '70/03/05'},
+                {extension: '83', birthday: '67/03/22'},
+                {extension: '66', birthday: '84/03/06'},
+                {extension: '台南11', birthday: '71/03/09'}
+            ]},
+            {month: '四月', count: 3, details: [
+                {extension: '38', birthday: '59/04/13'},
+                {extension: '14', birthday: '88/04/02'},
+                {extension: '法18', birthday: '73/04/28'}
+            ]},
+            {month: '五月', count: 5, details: [
+                {extension: '79', birthday: '85/05/31'},
+                {extension: '21', birthday: '82/05/15'},
+                {extension: '60', birthday: '72/05/13'},
+                {extension: '65', birthday: '75/05/25'},
+                {extension: '32', birthday: '84/05/01'}
+            ]},
+            {month: '六月', count: 6, details: [
+                {extension: '19', birthday: '72/06/10'},
+                {extension: '57', birthday: '74/06/11'},
+                {extension: '54', birthday: '77/06/26'},
+                {extension: '39', birthday: '74/06/13'},
+                {extension: '64', birthday: '82/06/07'},
+                {extension: '台南13', birthday: '72/06/05'}
+            ]},
+            {month: '七月', count: 2, details: [
+                {extension: '74', birthday: '64/07/22'},
+                {extension: '新竹11', birthday: '73/07/04'}
+            ]},
+            {month: '八月', count: 5, details: [
+                {extension: '22', birthday: '68/08/14'},
+                {extension: '71', birthday: '84/08/13'},
+                {extension: '67', birthday: '73/08/24'},
+                {extension: '56', birthday: '81/08/12'},
+                {extension: '新竹10', birthday: '68/08/10'}
+            ]},
+            {month: '九月', count: 9, details: [
+                {extension: '17', birthday: '67/09/01'},
+                {extension: '31', birthday: '65/09/08'},
+                {extension: '26', birthday: '73/09/13'},
+                {extension: '13', birthday: '76/09/29'},
+                {extension: '12', birthday: '79/09/23'},
+                {extension: '37', birthday: '86/09/17'},
+                {extension: '63', birthday: '75/09/29'},
+                {extension: '72', birthday: '84/09/05'},
+                {extension: '59', birthday: '72/09/11'}
+            ]},
+            {month: '十月', count: 7, details: [
+                {extension: '70', birthday: '65/10/17'},
+                {extension: '55', birthday: '75/10/15'},
+                {extension: '33', birthday: '72/10/06'},
+                {extension: '85', birthday: '83/10/06'},
+                {extension: '29', birthday: '72/10/16'},
+                {extension: '23', birthday: '70/10/18'},
+                {extension: '新竹19', birthday: '78/10/12'}
+            ]},
+            {month: '十一月', count: 6, details: [
+                {extension: '69', birthday: '67/11/29'},
+                {extension: '50', birthday: '86/11/12'},
+                {extension: '86', birthday: '82/11/21'},
+                {extension: '34', birthday: '70/11/19'},
+                {extension: '27', birthday: '71/11/29'},
+                {extension: '61', birthday: '86/11/07'}
+            ]},
+            {month: '十二月', count: 5, details: [
+                {extension: '24', birthday: '77/12/30'},
+                {extension: '15', birthday: '73/12/27'},
+                {extension: '58', birthday: '86/12/10'},
+                {extension: '30', birthday: '81/12/22'},
+                {extension: '52', birthday: '73/12/18'}
+            ]}
+        ];
+
+        // 建立柱狀圖
+        const ctx1 = document.getElementById('monthlyChart').getContext('2d');
+        const monthlyChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: monthlyData.map(item => item.month),
+                datasets: [{
+                    label: '生日人數',
+                    data: monthlyData.map(item => item.count),
+                    backgroundColor: [
+                        'rgba(102, 126, 234, 0.8)', // 一月
+                        'rgba(118, 75, 162, 0.8)',  // 二月
+                        'rgba(78, 205, 196, 0.8)',  // 三月
+                        'rgba(255, 107, 107, 0.8)', // 四月
+                        'rgba(255, 159, 67, 0.8)',  // 五月
+                        'rgba(72, 201, 176, 0.8)',  // 六月
+                        'rgba(255, 195, 0, 0.8)',   // 七月
+                        'rgba(255, 99, 132, 0.8)',  // 八月
+                        'rgba(54, 162, 235, 0.8)',  // 九月
+                        'rgba(255, 159, 64, 0.8)',  // 十月
+                        'rgba(153, 102, 255, 0.8)', // 十一月
+                        'rgba(201, 203, 207, 0.8)'  // 十二月
+                    ],
+                    borderColor: [
+                        'rgba(102, 126, 234, 1)',
+                        'rgba(118, 75, 162, 1)',
+                        'rgba(78, 205, 196, 1)',
+                        'rgba(255, 107, 107, 1)',
+                        'rgba(255, 159, 67, 1)',
+                        'rgba(72, 201, 176, 1)',
+                        'rgba(255, 195, 0, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(201, 203, 207, 1)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            font: {
+                                size: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '人數',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '月份',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+        // 建立圓餅圖
+        const ctx2 = document.getElementById('pieChart').getContext('2d');
+        const pieChart = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: monthlyData.map(item => item.month),
+                datasets: [{
+                    data: monthlyData.map(item => item.count),
+                    backgroundColor: [
+                        '#667eea', '#764ba2', '#4ecdc4', '#ff6b6b',
+                        '#ffa500', '#48c9b0', '#ffc300', '#ff6384',
+                        '#36a2eb', '#ff9f40', '#9966ff', '#c9cbcf'
+                    ],
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            font: {
+                                size: 12
+                            },
+                            padding: 15
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+        // 建立月份詳細清單
+        const monthsGrid = document.getElementById('monthsGrid');
+        monthlyData.forEach((monthData, index) => {
+            const monthCard = document.createElement('div');
+            monthCard.className = 'month-card';
+            
+            // 標記最多和最少的月份
+            if (monthData.count === 9) {
+                monthCard.classList.add('highlight-max');
+            } else if (monthData.count === 2) {
+                monthCard.classList.add('highlight-min');
+            }
+            
+            const birthdayItems = monthData.details.map(detail => 
+                `<span class="birthday-item">${detail.extension} (${detail.birthday.split('/')[1]}/${detail.birthday.split('/')[2]})</span>`
+            ).join('');
+            
+            monthCard.innerHTML = `
+                <div class="month-header">
+                    <span class="month-name">${monthData.month}</span>
+                    <span class="month-count">${monthData.count}人</span>
+                </div>
+                <div class="birthday-list">
+                    ${birthdayItems}
+                </div>
+            `;
+            
+            monthsGrid.appendChild(monthCard);
+        });
+
+        // 計算季節分布
+        const seasons = {
+            spring: { name: '春季', months: ['三月', '四月', '五月'], count: 0 },
+            summer: { name: '夏季', months: ['六月', '七月', '八月'], count: 0 },
+            autumn: { name: '秋季', months: ['九月', '十月', '十一月'], count: 0 },
+            winter: { name: '冬季', months: ['十二月', '一月', '二月'], count: 0 }
+        };
+
+        monthlyData.forEach(monthData => {
+            if (seasons.spring.months.includes(monthData.month)) {
+                seasons.spring.count += monthData.count;
+            } else if (seasons.summer.months.includes(monthData.month)) {
+                seasons.summer.count += monthData.count;
+            } else if (seasons.autumn.months.includes(monthData.month)) {
+                seasons.autumn.count += monthData.count;
+            } else if (seasons.winter.months.includes(monthData.month)) {
+                seasons.winter.count += monthData.count;
+            }
+        });
+
+        // 建立季節分析
+        const seasonGrid = document.getElementById('seasonGrid');
+        Object.entries(seasons).forEach(([key, season]) => {
+            const seasonCard = document.createElement('div');
+            seasonCard.className = `season-card ${key}`;
+            seasonCard.innerHTML = `
+                <div style="font-size: 1.3em; margin-bottom: 10px;">${season.name}</div>
+                <div style="font-size: 2em; margin-bottom: 5px;">${season.count}人</div>
+                <div style="font-size: 0.9em; opacity: 0.9;">${(season.count/65*100).toFixed(1)}%</div>
+            `;
+            seasonGrid.appendChild(seasonCard);
+        });
+    </script>
+</body>
 </html>

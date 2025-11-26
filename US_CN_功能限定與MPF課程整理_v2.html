@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>US_CN_功能限定與MPF課程整理_v2</title>
+
+
+<style type="text/css">
+body {
+  font-family: Helvetica, arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: white;
+  padding: 30px; }
+
+body > *:first-child {
+  margin-top: 0 !important; }
+body > *:last-child {
+  margin-bottom: 0 !important; }
+
+a {
+  color: #4183C4; }
+a.absent {
+  color: #cc0000; }
+a.anchor {
+  display: block;
+  padding-left: 30px;
+  margin-left: -30px;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0; }
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+  cursor: text;
+  position: relative; }
+
+h1:hover a.anchor, h2:hover a.anchor, h3:hover a.anchor, h4:hover a.anchor, h5:hover a.anchor, h6:hover a.anchor {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA09pVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoMTMuMCAyMDEyMDMwNS5tLjQxNSAyMDEyLzAzLzA1OjIxOjAwOjAwKSAgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OUM2NjlDQjI4ODBGMTFFMTg1ODlEODNERDJBRjUwQTQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OUM2NjlDQjM4ODBGMTFFMTg1ODlEODNERDJBRjUwQTQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5QzY2OUNCMDg4MEYxMUUxODU4OUQ4M0REMkFGNTBBNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo5QzY2OUNCMTg4MEYxMUUxODU4OUQ4M0REMkFGNTBBNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PsQhXeAAAABfSURBVHjaYvz//z8DJYCRUgMYQAbAMBQIAvEqkBQWXI6sHqwHiwG70TTBxGaiWwjCTGgOUgJiF1J8wMRAIUA34B4Q76HUBelAfJYSA0CuMIEaRP8wGIkGMA54bgQIMACAmkXJi0hKJQAAAABJRU5ErkJggg==) no-repeat 10px center;
+  text-decoration: none; }
+
+h1 tt, h1 code {
+  font-size: inherit; }
+
+h2 tt, h2 code {
+  font-size: inherit; }
+
+h3 tt, h3 code {
+  font-size: inherit; }
+
+h4 tt, h4 code {
+  font-size: inherit; }
+
+h5 tt, h5 code {
+  font-size: inherit; }
+
+h6 tt, h6 code {
+  font-size: inherit; }
+
+h1 {
+  font-size: 28px;
+  color: black; }
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #cccccc;
+  color: black; }
+
+h3 {
+  font-size: 18px; }
+
+h4 {
+  font-size: 16px; }
+
+h5 {
+  font-size: 14px; }
+
+h6 {
+  color: #777777;
+  font-size: 14px; }
+
+p, blockquote, ul, ol, dl, li, table, pre {
+  margin: 15px 0; }
+
+hr {
+  background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAECAYAAACtBE5DAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OENDRjNBN0E2NTZBMTFFMEI3QjRBODM4NzJDMjlGNDgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OENDRjNBN0I2NTZBMTFFMEI3QjRBODM4NzJDMjlGNDgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4Q0NGM0E3ODY1NkExMUUwQjdCNEE4Mzg3MkMyOUY0OCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo4Q0NGM0E3OTY1NkExMUUwQjdCNEE4Mzg3MkMyOUY0OCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PqqezsUAAAAfSURBVHjaYmRABcYwBiM2QSA4y4hNEKYDQxAEAAIMAHNGAzhkPOlYAAAAAElFTkSuQmCC) repeat-x 0 0;
+  border: 0 none;
+  color: #cccccc;
+  height: 4px;
+  padding: 0;
+}
+
+body > h2:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+body > h1:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+  body > h1:first-child + h2 {
+    margin-top: 0;
+    padding-top: 0; }
+body > h3:first-child, body > h4:first-child, body > h5:first-child, body > h6:first-child {
+  margin-top: 0;
+  padding-top: 0; }
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0; }
+
+h1 p, h2 p, h3 p, h4 p, h5 p, h6 p {
+  margin-top: 0; }
+
+li p.first {
+  display: inline-block; }
+li {
+  margin: 0; }
+ul, ol {
+  padding-left: 30px; }
+
+ul :first-child, ol :first-child {
+  margin-top: 0; }
+
+dl {
+  padding: 0; }
+  dl dt {
+    font-size: 14px;
+    font-weight: bold;
+    font-style: italic;
+    padding: 0;
+    margin: 15px 0 5px; }
+    dl dt:first-child {
+      padding: 0; }
+    dl dt > :first-child {
+      margin-top: 0; }
+    dl dt > :last-child {
+      margin-bottom: 0; }
+  dl dd {
+    margin: 0 0 15px;
+    padding: 0 15px; }
+    dl dd > :first-child {
+      margin-top: 0; }
+    dl dd > :last-child {
+      margin-bottom: 0; }
+
+blockquote {
+  border-left: 4px solid #dddddd;
+  padding: 0 15px;
+  color: #777777; }
+  blockquote > :first-child {
+    margin-top: 0; }
+  blockquote > :last-child {
+    margin-bottom: 0; }
+
+table {
+  padding: 0;border-collapse: collapse; }
+  table tr {
+    border-top: 1px solid #cccccc;
+    background-color: white;
+    margin: 0;
+    padding: 0; }
+    table tr:nth-child(2n) {
+      background-color: #f8f8f8; }
+    table tr th {
+      font-weight: bold;
+      border: 1px solid #cccccc;
+      margin: 0;
+      padding: 6px 13px; }
+    table tr td {
+      border: 1px solid #cccccc;
+      margin: 0;
+      padding: 6px 13px; }
+    table tr th :first-child, table tr td :first-child {
+      margin-top: 0; }
+    table tr th :last-child, table tr td :last-child {
+      margin-bottom: 0; }
+
+img {
+  max-width: 100%; }
+
+span.frame {
+  display: block;
+  overflow: hidden; }
+  span.frame > span {
+    border: 1px solid #dddddd;
+    display: block;
+    float: left;
+    overflow: hidden;
+    margin: 13px 0 0;
+    padding: 7px;
+    width: auto; }
+  span.frame span img {
+    display: block;
+    float: left; }
+  span.frame span span {
+    clear: both;
+    color: #333333;
+    display: block;
+    padding: 5px 0 0; }
+span.align-center {
+  display: block;
+  overflow: hidden;
+  clear: both; }
+  span.align-center > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px auto 0;
+    text-align: center; }
+  span.align-center span img {
+    margin: 0 auto;
+    text-align: center; }
+span.align-right {
+  display: block;
+  overflow: hidden;
+  clear: both; }
+  span.align-right > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px 0 0;
+    text-align: right; }
+  span.align-right span img {
+    margin: 0;
+    text-align: right; }
+span.float-left {
+  display: block;
+  margin-right: 13px;
+  overflow: hidden;
+  float: left; }
+  span.float-left span {
+    margin: 13px 0 0; }
+span.float-right {
+  display: block;
+  margin-left: 13px;
+  overflow: hidden;
+  float: right; }
+  span.float-right > span {
+    display: block;
+    overflow: hidden;
+    margin: 13px auto 0;
+    text-align: right; }
+
+code, tt {
+  margin: 0 2px;
+  padding: 0 5px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px; }
+
+pre code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent; }
+
+.highlight pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px; }
+  pre code, pre tt {
+    background-color: transparent;
+    border: none; }
+
+sup {
+    font-size: 0.83em;
+    vertical-align: super;
+    line-height: 0;
+}
+
+kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  font-size: 11px;
+  line-height: 10px;
+  color: #555;
+  vertical-align: middle;
+  background-color: #fcfcfc;
+  border: solid 1px #ccc;
+  border-bottom-color: #bbb;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #bbb
+}
+
+* {
+	-webkit-print-color-adjust: exact;
+}
+@media screen and (min-width: 914px) {
+    body {
+        width: 854px;
+        margin:0 auto;
+    }
+}
+@media print {
+	table, pre {
+		page-break-inside: avoid;
+	}
+	pre {
+		word-wrap: break-word;
+	}
+}
+</style>
+
+<style type="text/css">
+/**
+ * prism.js Dark theme for JavaScript, CSS and HTML
+ * Based on the slides of the talk “/Reg(exp){2}lained/”
+ * @author Lea Verou
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: white;
+	background: none;
+	text-shadow: 0 -.1em .2em black;
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+@media print {
+	code[class*="language-"],
+	pre[class*="language-"] {
+		text-shadow: none;
+	}
+}
+
+pre[class*="language-"],
+:not(pre) > code[class*="language-"] {
+	background: hsl(30, 20%, 25%);
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border: .3em solid hsl(30, 20%, 40%);
+	border-radius: .5em;
+	box-shadow: 1px 1px .5em black inset;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .15em .2em .05em;
+	border-radius: .3em;
+	border: .13em solid hsl(30, 20%, 40%);
+	box-shadow: 1px 1px .3em -.1em black inset;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: hsl(30, 20%, 50%);
+}
+
+.token.punctuation {
+	opacity: .7;
+}
+
+.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+	color: hsl(350, 40%, 70%);
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: hsl(75, 70%, 60%);
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: hsl(40, 90%, 60%);
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+	color: hsl(350, 40%, 70%);
+}
+
+.token.regex,
+.token.important {
+	color: #e90;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+
+.token.deleted {
+	color: red;
+}
+</style>
+
+<style type="text/css">
+pre.line-numbers {
+	position: relative;
+	padding-left: 3.8em;
+	counter-reset: linenumber;
+}
+
+pre.line-numbers > code {
+	position: relative;
+}
+
+.line-numbers .line-numbers-rows {
+	position: absolute;
+	pointer-events: none;
+	top: 0;
+	font-size: 100%;
+	left: -3.8em;
+	width: 3em; /* works for line-numbers below 1000 lines */
+	letter-spacing: -1px;
+	border-right: 1px solid #999;
+
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+}
+
+	.line-numbers-rows > span {
+		pointer-events: none;
+		display: block;
+		counter-increment: linenumber;
+	}
+
+		.line-numbers-rows > span:before {
+			content: counter(linenumber);
+			color: #999;
+			display: block;
+			padding-right: 0.8em;
+			text-align: right;
+		}
+</style>
+
+
+</head>
+
+<body>
+
+<h1 id="toc_0">美國及中國功能限定與 MPF 專利課程整理</h1>
+
+<p><strong>課程講師</strong>: 盧專利師<br><br>
+<strong>課程日期</strong>: 2025年3月5日<br><br>
+<strong>課程主題</strong>: 美國與中國專利中的功能性用語與 Means-Plus-Function (MPF) 規則</p>
+
+<hr>
+
+<h2 id="toc_1">課程概述</h2>
+
+<p>本課程聚焦於美國與中國專利審查中對功能性限定(Functional Limitation)與手段功能用語(Means-Plus-Function, MPF)的處理方式。由於美國在此領域的法律體系較為完整,課程先探討美國規則,再對照中國的相關規定。</p>
+
+<hr>
+
+<h2 id="toc_2">第一部分:美國專利中的功能性用語與 MPF</h2>
+
+<h3 id="toc_3">1.1 功能性用語 vs 結構性限定</h3>
+
+<h4 id="toc_4">基本定義</h4>
+
+<p><strong>功能性用語(Functional Language)</strong>:<br>
+- 描述元件「做什麼」(what it does)<br>
+- 例如:configured to、adapted to、operable to + 功能描述<br>
+- 文義範圍:涵蓋所有能實現所記載功能的裝置</p>
+
+<p><strong>結構性限定(Structural Limitation)</strong>:<br>
+- 描述元件「是什麼」(what it is)<br>
+- 明確限定特定結構<br>
+- 文義範圍:限於所記載的結構本身</p>
+
+<h4 id="toc_5">重要原則</h4>
+
+<blockquote>
+<p><q>物的範圍是涵蓋這個物品是什麼,不是某個物品做什麼。</q></p>
+</blockquote>
+
+<p>對於電腦實現的功能性發明,範圍應解釋為<strong>硬體與軟體的組合</strong>:<br>
+- 硬體:CPU、處理器等<br>
+- 軟體:執行功能所需的演算法</p>
+
+<hr>
+
+<h3 id="toc_6">1.2 MPF 的立法背景與目的</h3>
+
+<h4 id="toc_7">立法歷史</h4>
+
+<ul>
+<li><strong>1952年立法</strong>:MPF 規則加入美國專利法</li>
+<li><strong>法源依據</strong>:基於 1946 年最高法院判決見解</li>
+<li><strong>立法目的</strong>:避免純功能性特徵阻礙創新</li>
+</ul>
+
+<h4 id="toc_8">立法理由(關鍵引文)</h4>
+
+<blockquote>
+<p><q>請求項宣告做某件事的所有手段,就是記載它的功能。如果範圍涵蓋實現這個功能的所有手段,將會:<br>
+- 阻礙合理的迴避設計<br>
+- 給予發明人從未考慮過的結構與方法的排他權<br>
+- 抑制解決問題的非均等技術方案</q></p>
+</blockquote>
+
+<p>因此,MPF 規則將功能性特徵的範圍限縮至<strong>說明書對應結構及其均等物</strong>,以平衡專利保護與創新自由。</p>
+
+<hr>
+
+<h3 id="toc_9">1.3 35 USC §112(f) - MPF 規則核心</h3>
+
+<h4 id="toc_10">法條要旨</h4>
+
+<p>允許以功能描述元件,但保護範圍限縮至:<br>
+- <strong>說明書揭露的對應結構</strong>(corresponding structure)<br>
+- <strong>及其均等物</strong>(and equivalents thereof)</p>
+
+<h4 id="toc_11">MPF 觸發的三要件</h4>
+
+<ol>
+<li><strong>使用 <q>means</q> 或 <q>step</q> 關鍵字</strong></li>
+<li><strong>未明確描述足夠的結構</strong></li>
+<li><strong>以功能方式描述元件</strong></li>
+</ol>
+
+<hr>
+
+<h3 id="toc_12">1.4 MPF 判斷的推定原則(Presumption)</h3>
+
+<h4 id="toc_13">使用 <q>means</q> 時</h4>
+
+<ul>
+<li><strong>推定為 MPF</strong></li>
+<li><strong>舉證責任</strong>:申請人需舉證推翻(證明已描述足夠結構)</li>
+<li>推翻方式:證明記載了足以實現功能的充分結構</li>
+</ul>
+
+<h4 id="toc_14">未使用 <q>means</q> 時</h4>
+
+<ul>
+<li><strong>推定非 MPF</strong></li>
+<li><strong>舉證責任</strong>:USPTO 需舉證符合三要件</li>
+<li>須證明:(1)使用通用字眼 (2)未記載結構 (3)純功能描述</li>
+</ul>
+
+<hr>
+
+<h3 id="toc_15">1.5 Single Means Claim(單一手段請求項)</h3>
+
+<h4 id="toc_16">定義</h4>
+
+<p>請求項僅包含單一元件,且該元件為 MPF 用語:<br>
+<code><br>
+例:A device comprising a means for [功能]<br>
+</code></p>
+
+<h4 id="toc_17">特殊規則</h4>
+
+<ul>
+<li><strong>不適用 §112(f)</strong>: 因為請求項非「組合式請求項」(combination claim)</li>
+<li>§112(f) 定義:針對組合式請求項中的<strong>一個元件</strong>(element)</li>
+<li><strong>範圍解釋</strong>:涵蓋所有能實現該功能的結構(非限於說明書記載)</li>
+</ul>
+
+<h4 id="toc_18">實務問題</h4>
+
+<ul>
+<li><strong>Enablement 問題</strong>:說明書無法記載所有實現方式
+
+<ul>
+<li>假設實現功能的結構有 100 種</li>
+<li>說明書僅記載 50 種</li>
+<li>未記載的 50 種導致不滿足充分揭露(Enablement)</li>
+</ul></li>
+</ul>
+
+<h4 id="toc_19">電腦實現發明的例外</h4>
+
+<p>包含一個處理器執行多個功能的請求項<strong>不是</strong> Single Means Claim:<br>
+<code><br>
+例:A processor configured to:<br>
+    - execute function A,<br>
+    - execute function B,<br>
+    - execute function C<br>
+</code></p>
+
+<ul>
+<li>每個程式化的功能視為一個獨立元件</li>
+<li>各別功能可能被視為 MPF</li>
+</ul>
+
+<hr>
+
+<h3 id="toc_20">1.6 關鍵判例發展</h3>
+
+<h4 id="toc_21">Williamson v. Citrix (2015)</h4>
+
+<p><strong>判決要點</strong>:<br>
+- 確立 <q>module</q>、<q>unit</q>、<q>mechanism</q> 等通用術語可能觸發 MPF<br>
+- 關鍵判斷:是否為 <strong>nonce word</strong>(空泛字眼)+ 純功能描述<br>
+- <strong>影響</strong>:擴大 MPF 適用範圍</p>
+
+<p><strong>判斷標準</strong>:</p>
+
+<blockquote>
+<p><q>整個記載是否記載了足以實踐所記載功能的結構</q></p>
+</blockquote>
+
+<h4 id="toc_22">Intel v. Qualcomm (2020)</h4>
+
+<p><strong>判決要點</strong>:<br>
+- 修正 Williamson 過度擴張的趨勢<br>
+- <strong>強調</strong>:即使使用通用術語,若有結構性描述仍可避免 MPF</p>
+
+<p><strong>實務建議</strong>:<br>
+描述元件時需包含<strong>結構特徵</strong>,不能僅用通用詞 + 功能</p>
+
+<hr>
+
+<h3 id="toc_23">1.7 如何判斷是否有「結構特徵」</h3>
+
+<h4 id="toc_24">USPTO 判斷標準(來自 2024年3月 Memorandum)</h4>
+
+<p>判斷該用語是否具有足以達成功能的結構,可從以下來源確認:</p>
+
+<ol>
+<li><p><strong>說明書支持</strong>(最重要)</p>
+
+<ul>
+<li>說明書是否明確記載該用語具有結構特徵</li>
+<li><strong>建議做法</strong>:說明書必須寫清楚</li>
+</ul></li>
+<li><p><strong>字典或領域字典</strong></p>
+
+<ul>
+<li>相對不易,字典不一定寫得清楚</li>
+<li>不一定能證明結構特徵</li>
+</ul></li>
+<li><p><strong>現行技術(Prior Art)</strong></p>
+
+<ul>
+<li>引用 In re Katz 判例(已被選為先例)</li>
+<li>現行技術提供證據顯示該用語具有結構特徵</li>
+<li>相對較難舉證</li>
+</ul></li>
+</ol>
+
+<p><strong>實務重點</strong>:最可靠的方式是在<strong>說明書中明確記載結構</strong></p>
+
+<hr>
+
+<h3 id="toc_25">1.8 電腦實現發明的 MPF 要求</h3>
+
+<h4 id="toc_26">軟體結構的定義</h4>
+
+<p>根據判例,軟體的結構可以是:<br>
+- <strong>演算法</strong>(Algorithm)<br>
+- <strong>流程圖</strong>(Flowchart)<br>
+- <strong>特定指令組或規則組</strong></p>
+
+<h4 id="toc_27">滿足 MPF 的方法</h4>
+
+<p><strong>基本原則</strong>:<br>
+- 通用電腦的基本功能(BIOS 層級):接收、處理、儲存、輸出資料<br>
+- <strong>演算法的作用</strong>:填補從基本功能到請求項功能的 GAP</p>
+
+<p><strong>公式</strong>:<br>
+<code><br>
+通用電腦基本功能 + 演算法 = 請求項功能<br>
+</code></p>
+
+<p><strong>撰寫建議</strong>:<br>
+- 說明書需記載從基本功能往上加的演算法、公式或流程<br>
+- 使演算法與請求項功能建立明確對應關係</p>
+
+<hr>
+
+<h3 id="toc_28">1.9 USPTO 2024年3月 Memorandum 重點</h3>
+
+<h4 id="toc_29">備忘錄目的</h4>
+
+<p>提醒審查員:<br>
+- 應用既有的 MPF 審查指引<br>
+- 確保審查記錄的清晰性</p>
+
+<h4 id="toc_30">審查員應執行事項</h4>
+
+<ol>
+<li><p><strong>確定特徵是否屬於 §112(f)</strong></p>
+
+<ul>
+<li>明確認定並記錄於審查意見</li>
+</ul></li>
+<li><p><strong>記錄清楚</strong></p>
+
+<ul>
+<li>說明為何認定為 §112(f)</li>
+<li>指出說明書對應的結構是什麼</li>
+</ul></li>
+<li><p><strong>評估說明書支持</strong></p>
+
+<ul>
+<li>檢查是否滿足 §112(a) written description</li>
+<li>檢查是否滿足 §112(b) definiteness</li>
+</ul></li>
+</ol>
+
+<h4 id="toc_31">Step-Plus-Function (SPF)</h4>
+
+<ul>
+<li>SPF 通常以 <q>step for</q> 開始</li>
+<li><q>step</q> 或 <q>step of</q> <strong>不是</strong> SPF</li>
+<li>方法請求項通常以動名詞開始,原則上不是 SPF</li>
+<li><strong>實務觀察</strong>:大部分是 MPF,很少看到 SPF</li>
+</ul>
+
+<hr>
+
+<h3 id="toc_32">1.10 實務案例:過濾元件</h3>
+
+<h4 id="toc_33">案例背景</h4>
+
+<ul>
+<li><strong>請求項</strong>:過濾元件(filtering element)</li>
+<li><strong>說明書</strong>:過濾元件(filtering element)</li>
+<li><strong>審查員意見</strong>:
+
+<ul>
+<li>認定為 MPF</li>
+<li>說明書未明確記載對應結構</li>
+<li>但從圖式看出該元件就是過濾器(filter)</li>
+<li>審查員自行認定圖式結構為對應結構,因此「解套」</li>
+</ul></li>
+</ul>
+
+<h4 id="toc_34">風險提示</h4>
+
+<blockquote>
+<p><q>這個做法存在蠻大的風險</q></p>
+</blockquote>
+
+<ul>
+<li>依賴審查員主動解釋</li>
+<li>不確定性高</li>
+<li><strong>建議</strong>:說明書應明確記載對應結構</li>
+</ul>
+
+<hr>
+
+<h3 id="toc_35">1.11 收到 MPF 核駁時的答辯策略</h3>
+
+<h4 id="toc_36">Step 1: 爭執 MPF 適用性</h4>
+
+<p><strong>主張</strong>:<br>
+- 已記載足夠結構描述<br>
+- 引用 Intel v. Qualcomm 等判例<br>
+- 說明非 nonce word(非空泛字眼)</p>
+
+<h4 id="toc_37">Step 2: 修正權利範圍</h4>
+
+<p><strong>考量點</strong>:是否應修正請求項?</p>
+
+<h5 id="toc_38">範圍比較分析</h5>
+
+<p><strong>案例</strong>:播放裝置<br>
+- 說明書對應結構:揚聲器(speaker)<br>
+- 審查意見:播放裝置是 §112(f)</p>
+
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>文義範圍</th>
+<th>均等範圍</th>
+<th>審查歷史禁反言</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><strong>不修正</strong>(維持 MPF)</td>
+<td>揚聲器及其均等物</td>
+<td>有</td>
+<td>無</td>
+</tr>
+<tr>
+<td><strong>修正為揚聲器</strong></td>
+<td>僅揚聲器</td>
+<td>可能被阻絕</td>
+<td>是(觸發)</td>
+</tr>
+</tbody>
+</table>
+
+<h5 id="toc_39">修正的風險</h5>
+
+<p>修正會觸發審查歷史禁反言(Prosecution History Estoppel):<br>
+- 有可能阻絕均等範圍<br>
+- 前提:修正是為了克服核駁理由<br>
+- <strong>實務困境</strong>:<br>
+  - MPF 核駁通常伴隨 §102/§103 核駁<br>
+  - 很難主張修正「不是為了克服核駁」<br>
+  - 幾乎必然成立禁反言</p>
+
+<h5 id="toc_40">結論</h5>
+
+<p><strong>不建議修正請求項</strong>:<br>
+- 維持 MPF → 保有「對應結構 + 均等物」範圍<br>
+- 修正 → 僅剩文義範圍,失去均等保護</p>
+
+<h4 id="toc_41">Step 3: 說明書補充(限於無新事項)</h4>
+
+<ul>
+<li>透過審查歷程檔案建立對應關係</li>
+<li>明確指出說明書段落支持</li>
+<li>不能引入申請日後的新事項</li>
+</ul>
+
+<hr>
+
+<h3 id="toc_42">1.12 MPF 文義範圍與均等論的關係</h3>
+
+<h4 id="toc_43">MPF 文義範圍</h4>
+
+<p><strong>構成要件</strong>:<br>
+- <strong>功能相同</strong>(identical function) ← 請求項已明定<br>
+- <strong>手段(結構)實質相同</strong><br>
+- <strong>結果實質相同</strong></p>
+
+<p><strong>範圍</strong>:說明書對應結構及其均等物</p>
+
+<h4 id="toc_44">均等論(Doctrine of Equivalents, DOE)</h4>
+
+<p><strong>構成要件(三不測試)</strong>:<br>
+- <strong>手段(Way)實質相同</strong><br>
+- <strong>功能(Function)實質相同</strong><br><br>
+- <strong>結果(Result)實質相同</strong></p>
+
+<hr>
+
+<h3 id="toc_45">1.13 MPF 文義侵權與均等侵權的差異</h3>
+
+<h4 id="toc_46">關鍵判例引文</h4>
+
+<blockquote>
+<p><q>基於實質不同的手段實現相同的功能而達致相同的結果,就沒有文義侵權。</q></p>
+</blockquote>
+
+<h4 id="toc_47">分析邏輯</h4>
+
+<p><strong>狀況</strong>:被控侵權品以<strong>實質不同的手段</strong>實現相同功能與結果</p>
+
+<p><strong>MPF 文義侵權判斷</strong>:<br>
+- 功能相同 ✓ (請求項限定)<br>
+- 手段實質相同 ✗ (實質不同)<br>
+- → <strong>文義範圍不成立</strong></p>
+
+<p><strong>均等論侵權判斷</strong>:<br>
+- Way 實質相同 ✗ (實質不同)<br>
+- Function 實質相同 ✓<br>
+- Result 實質相同 ✓<br>
+- → <strong>均等範圍也不成立</strong> (三者皆須實質相同)</p>
+
+<h4 id="toc_48">結論</h4>
+
+<ul>
+<li>MPF 文義範圍與均等論範圍的判斷方式相同</li>
+<li>若 MPF 文義範圍未滿足(W 或 R 不符) → 均等論也不會滿足</li>
+<li>若被控產品執行不同功能(非實質相同) → 文義與均等皆不成立</li>
+</ul>
+
+<hr>
+
+<h3 id="toc_49">1.14 審查歷史禁反言(Prosecution History Estoppel)對 MPF 的影響</h3>
+
+<h4 id="toc_50">基本規則</h4>
+
+<p><strong>Disclaimer(放棄聲明)</strong>:<br>
+- 發明人在審查歷程中放棄特定結構<br>
+- 該放棄的結構不在「其均等物」範圍內<br>
+- 對 MPF 文義範圍的「其均等」有限定效果</p>
+
+<hr>
+
+<h3 id="toc_51">1.15 MPF 範圍圖解分析</h3>
+
+<h4 id="toc_52">案例:彈性元件(Elastic Element)</h4>
+
+<p><strong>技術特徵階層</strong>:<br>
+<code><br>
+功能性描述:彈性元件(具有彈性功能)<br>
+    ↓<br>
+上位結構:彈簧(Spring)<br>
+    ↓<br>
+具體實施方式:<br>
+    - 拉伸彈簧(Tension Spring)<br>
+    - 壓縮彈簧(Compression Spring)<br>
+</code></p>
+
+<h4 id="toc_53">結構性限定寫法</h4>
+
+<p><strong>請求項</strong>:彈簧(Spring)</p>
+
+<p><strong>文義範圍</strong>:<br>
+- 彈簧(上位結構)<br>
+- 拉伸彈簧<br>
+- 壓縮彈簧</p>
+
+<p><strong>均等範圍</strong>:<br>
+- 彈簧的均等物(實質相同的 Way, Function, Result)<br>
+- 拉伸彈簧的均等物<br>
+- 壓縮彈簧的均等物</p>
+
+<h4 id="toc_54">MPF 寫法</h4>
+
+<p><strong>請求項</strong>:彈性元件(means for providing elasticity)</p>
+
+<p><strong>文義範圍</strong>:<br>
+- 說明書對應結構:<br>
+  - 彈簧(上位結構)<br>
+  - 拉伸彈簧<br>
+  - 壓縮彈簧<br>
+- 及其均等物(相同 Function + 實質相同 W &amp; R)</p>
+
+<p><strong>問題</strong>:「其均等物」是否還有均等論的均等範圍?</p>
+
+<hr>
+
+<h3 id="toc_55">1.16 MPF「其均等物」的範圍爭議</h3>
+
+<h4 id="toc_56">問題一:是否有雙重均等?</h4>
+
+<p><strong>爭議點</strong>:<br>
+- MPF 文義範圍已包含「對應結構及其均等物」<br>
+- 是否還有「均等論的均等範圍」?</p>
+
+<p><strong>答案</strong>:</p>
+
+<blockquote>
+<p>根據 Warner-Jenkinson 判例(1997):<br><br>
+<strong>專利法並未創造 MPF 特徵的『其均等物的均等範圍』</strong></p>
+</blockquote>
+
+<p><strong>結論</strong>:其均等物<strong>沒有</strong>均等論的均等範圍(打叉)</p>
+
+<h4 id="toc_57">問題二:時間點差異</h4>
+
+<p><strong>公告時 vs 侵權時</strong>:<br>
+- <strong>MPF 文義範圍</strong>:公告時已存在的均等結構<br>
+- <strong>均等論範圍</strong>:侵權時存在的均等結構</p>
+
+<p><strong>爭議場景</strong>:<br>
+- 公告後才出現的新結構<br>
+- 該結構為相同功能 + 實質相同 W &amp; R<br>
+- MPF 文義範圍抓不到(公告時不存在)<br>
+- 均等論是否能抓回來?</p>
+
+<hr>
+
+<h3 id="toc_58">1.17 公告後新技術的均等侵權</h3>
+
+<h4 id="toc_59">錯誤判決(已被推翻)</h4>
+
+<p><strong>地院判決</strong>(非 MPF 特徵):</p>
+
+<blockquote>
+<p><q>非 MPF 特徵的 DOE 僅次於公告後出現的技術</q></p>
+</blockquote>
+
+<p>這個判決認為:<br>
+- 均等範圍只限於「公告時」到「侵權時」之間出現的技術<br>
+- 公告前的技術不含在均等範圍</p>
+
+<p><strong>結論</strong>:此判決是<strong>錯誤的</strong></p>
+
+<h4 id="toc_60">正確見解</h4>
+
+<p><strong>Festo 判例後續發展</strong>:<br>
+- 均等範圍基於<strong>公告前</strong>的均等<br>
+- 公告後才出現的相同功能均等結構:<br>
+  - MPF 無法抓(判斷時間點是公告時)<br>
+  - 但<strong>均等論可以抓</strong>(判斷時間點是侵權時)</p>
+
+<p><strong>重要判例(2014)</strong>:</p>
+
+<blockquote>
+<p><q>公告時不存在的結構(即新技術),並不排除均等論的均等侵權</q></p>
+</blockquote>
+
+<p><strong>推翻例外規則</strong>:<br>
+- Foreseeability Exception(可預見性例外)已被推翻<br>
+- 在公告時無法預見的結構<strong>仍可落入均等範圍</strong></p>
+
+<hr>
+
+<h3 id="toc_61">1.18 MPF 與均等論的兩大差異</h3>
+
+<h4 id="toc_62">差異一:時間點(Timing)</h4>
+
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>MPF 文義範圍</th>
+<th>均等論範圍</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>判斷時間</td>
+<td><strong>公告時</strong></td>
+<td><strong>侵權時</strong></td>
+</tr>
+<tr>
+<td>涵蓋結構</td>
+<td>公告時存在的對應結構及其均等</td>
+<td>侵權時存在的均等結構</td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="toc_63">差異二:功能要求(Function)</h4>
+
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>MPF 文義範圍</th>
+<th>均等論範圍</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>功能要求</td>
+<td><strong>Identical Function</strong><br>(相同功能)</td>
+<td><strong>Substantially Same Function</strong><br>(實質相同功能)</td>
+</tr>
+<tr>
+<td>其他要求</td>
+<td>實質相同 W &amp; R</td>
+<td>實質相同 W &amp; R</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h3 id="toc_64">1.19 MPF 不侵權與均等論侵權的關係</h3>
+
+<p><strong>重要原則</strong>:</p>
+
+<blockquote>
+<p><q>MPF 的不侵權結論,如果單純基於缺乏<strong>相同功能</strong>,並不能排除均等論的侵權</q></p>
+</blockquote>
+
+<p><strong>分析</strong>:<br>
+- MPF 要求:Identical Function<br>
+- 均等論要求:Substantially Same Function<br>
+- 被控產品可能:<br>
+  - 不滿足 MPF(功能不identical)<br>
+  - 但滿足均等論(功能 substantially same + W &amp; R substantially same)</p>
+
+<p><strong>結論</strong>:<br>
+- MPF 文義不侵權 ≠ 均等論不侵權<br>
+- 仍需分別判斷</p>
+
+<hr>
+
+<h3 id="toc_65">1.20 範圍差異的實務意義</h3>
+
+<h4 id="toc_66">結構性限定 vs MPF</h4>
+
+<p><strong>假設</strong>:<br>
+- 對應結構只有一個<br>
+- 或有共同上位結構<br>
+- 且無禁反言(Disclaimer)</p>
+
+<p><strong>結論</strong>:兩種寫法範圍應該差不多</p>
+
+<h4 id="toc_67">對應結構的解釋爭議</h4>
+
+<p><strong>不確定點</strong>:<br>
+- 說明書記載:「彈簧」<br>
+- 對應結構是否限於說明書這一<strong>顆</strong>彈簧?<br>
+- 還是可以用「彈簧」的文義範圍去讀?<br>
+  - 包括公告後出現的新型彈簧?</p>
+
+<p><strong>目前狀態</strong>:<br>
+- 沒有明確判例確認<br>
+- 某些判例提到:</p>
+
+<blockquote>
+<p><q>如果被控產品不是說明書對應的結構,還要再判斷其均等物</q></p>
+</blockquote>
+
+<ul>
+<li>暗示對應結構可能可以文義解讀</li>
+</ul>
+
+<hr>
+
+<h3 id="toc_68">1.21 MPF 對應結構的實務考量</h3>
+
+<h4 id="toc_69">多個對應結構的困境</h4>
+
+<p><strong>觀察</strong>:<br>
+- 如果 MPF 對應結構有兩個以上<br>
+- 很難有真正的共同上位結構</p>
+
+<p><strong>實例</strong>:壓縮彈簧 vs 拉伸彈簧<br>
+- 壓縮彈簧:提供推力<br>
+- 拉伸彈簧:提供拉力<br>
+- 要達成發明目的:<br>
+  - 提供推力 → 兩元件之間的關係設計不同<br>
+  - 提供拉力 → 兩元件之間的關係設計不同<br>
+- <strong>結論</strong>:難以用單一「彈簧」代表兩個結構<br>
+  - 必須設計成組件形式<br>
+  - 一個用拉伸彈簧,另一個用壓縮彈簧</p>
+
+<p><strong>推論</strong>:<br>
+- MPF 對應結構有兩個以上時<br>
+- 其上位通常<strong>仍是 MPF</strong>(功能性描述)<br>
+- 較難寫成純結構性描述</p>
+
+<hr>
+
+<h3 id="toc_70">1.22 撰寫策略建議</h3>
+
+<h4 id="toc_71">多重保護策略</h4>
+
+<p><strong>建議做法</strong>:<br>
+- 針對重要技術特徵<br>
+- 用<strong>不同的方法</strong>進行包覆</p>
+
+<p><strong>理由</strong>:<br>
+- 避免單一寫法的風險<br>
+- 精準性與廣度的平衡</p>
+
+<h4 id="toc_72">Code / Program 寫法</h4>
+
+<p><strong>來源</strong>:客戶端(徐瑞智總監)建議</p>
+
+<p><strong>優點</strong>:<br>
+- 先立(In re Katz)見解:</p>
+
+<blockquote>
+<p><q>寫 Code、Program 或 Software,基本上不是 nonce word</q></p>
+</blockquote>
+
+<ul>
+<li><strong>關鍵</strong>:這些詞本身具有結構意涵</li>
+<li>不會直接觸發 MPF</li>
+</ul>
+
+<p><strong>寫法</strong>:<br>
+<code><br>
+Software code configured to:<br>
+    - function A<br>
+    - function B<br>
+    - function C<br>
+</code></p>
+
+<p><strong>支持</strong>:很多判例支持此寫法</p>
+
+<hr>
+
+<h3 id="toc_73">1.23 軟體發明的特殊性</h3>
+
+<h4 id="toc_74">重要判例引文</h4>
+
+<blockquote>
+<p><q>軟體元件就跟機構領域不一樣。軟體碼或應用程式的特定結構,某種程式由它的功能來定義。</q></p>
+</blockquote>
+
+<p><strong>判斷標準</strong>:<br>
+- 決定軟體限制條件是否記載足夠結構時<br>
+- 法院仍會檢視程式碼或應用程式所記載的<strong>功能</strong><br>
+- 來決定所屬技術領域人士是否能理解系統用語充分記載明確結構</p>
+
+<p><strong>實務案例</strong>:<br>
+- 被告專家證人看了說明書記載<br>
+- 表示「知道對應哪些結構」<br>
+- 因此滿足 definiteness 要求<br>
+- 案件通過明確性審查</p>
+
+<hr>
+
+<h3 id="toc_75">1.24 Code/Program 寫法的風險考量</h3>
+
+<h4 id="toc_76">優點</h4>
+
+<ul>
+<li>不是 nonce word</li>
+<li>有判例支持</li>
+<li>客戶傾向使用(避免直接被認定為 MPF)</li>
+</ul>
+
+<h4 id="toc_77">風險</h4>
+
+<p><strong>回歸立法理由的擔憂</strong>:</p>
+
+<blockquote>
+<p><q>每個功能所對應的結構,如果說明書只寫了演算法,它的範圍仍然很廣,因為你根本不知道哪些演算法在你的範圍裡</q></p>
+</blockquote>
+
+<p><strong>潛在問題</strong>:<br>
+- 類似「使用者識別模組」案例<br>
+- 如果寫成「使用者識別 code」<br>
+- 可能相對好處理<br>
+- 但仍有不確定性</p>
+
+<p><strong>目前狀態</strong>:<br>
+- 到目前為止的判例支持<br>
+- 但需持續關注判例發展</p>
+
+<h4 id="toc_78">實務建議</h4>
+
+<ul>
+<li>客戶傾向不用「module」(直接觸發 MPF)</li>
+<li>偏好使用「code」和「program」</li>
+<li>至少到目前為止的判例可接受</li>
+</ul>
+
+<hr>
+
+<h2 id="toc_79">第二部分:中國專利中的功能性限定</h2>
+
+<h3 id="toc_80">2.1 審查指南基本規定</h3>
+
+<p><strong>法源</strong>:專利審查指南第二部分第二章 3.2.1</p>
+
+<h4 id="toc_81">原則立場</h4>
+
+<blockquote>
+<p><q>盡量避免使用功能或者效果的特徵來限定發明</q></p>
+</blockquote>
+
+<p><strong>可使用條件</strong>(兩個「或」關係):</p>
+
+<ol>
+<li><p><strong>無法用結構特徵限定</strong></p>
+
+<ul>
+<li>某技術特徵無法用結構特徵來限定</li>
+</ul></li>
+<li><p><strong>功能限定更恰當</strong></p>
+
+<ul>
+<li>用結構特徵限定,不如用功能特徵來限定更為恰當</li>
+</ul></li>
+</ol>
+
+<p><strong>且</strong>需滿足:<br>
+- 功能能通過說明書規定的實驗或操作<br>
+- 或通常知識者慣用的手段直接肯定地驗證</p>
+
+<p><strong>結論</strong>:原則上<strong>不允許</strong>使用功能限定</p>
+
+<hr>
+
+<h3 id="toc_82">2.2 功能性限定的範圍解釋</h3>
+
+<h4 id="toc_83">審查階段</h4>
+
+<p><strong>範圍解釋</strong>:</p>
+
+<blockquote>
+<p><q>權利要求中用功能限定的技術特徵,其範圍解釋為涵蓋了所有能實現該功能的實施方式</q></p>
+</blockquote>
+
+<p><strong>結果</strong>:<br>
+- 範圍非常廣<br>
+- 容易找到對比檔案(prior art)<br>
+- 較易被核駁</p>
+
+<hr>
+
+<h3 id="toc_84">2.3 充分揭露要求(Written Description Support)</h3>
+
+<h4 id="toc_85">判斷標準</h4>
+
+<p><strong>問題</strong>:功能性限定的特徵是否得到說明書支持?</p>
+
+<p><strong>判斷方法</strong>:<br>
+1. <strong>所屬領域技術人員</strong>(通常知識者)能夠明瞭該功能<br>
+2. 可以用說明書<strong>沒有提到</strong>的其他方式來完成</p>
+
+<h4 id="toc_86">不得使用的情況</h4>
+
+<p><strong>狀況一</strong>:審查員想不到第三種實施方式<br>
+- 說明書記載兩種實施方式<br>
+- 審查員無法想到第三種<br>
+- → <strong>不能用功能限定</strong></p>
+
+<p><strong>狀況二</strong>:審查員想到的方式不 work<br>
+- 審查員想到某種替代方案<br>
+- 套進去後無法解決發明所要解決的問題<br>
+- 或無法達到相同效果<br>
+- → <strong>不能用功能限定</strong></p>
+
+<p><strong>結論</strong>:<br>
+- 是否得到說明書支持 → <strong>審查員判斷</strong><br>
+- 審查員有很大的裁量權</p>
+
+<hr>
+
+<h3 id="toc_87">2.4 說明書撰寫要求</h3>
+
+<h4 id="toc_88">不當寫法</h4>
+
+<p><strong>模糊描述</strong>:</p>
+
+<blockquote>
+<p><q>其他的替代方式也可以適用,可以達到這個功能</q></p>
+</blockquote>
+
+<p><strong>問題</strong>:<br>
+- 這種寫法毫無意義<br>
+- 不滿足具體揭露要求</p>
+
+<h4 id="toc_89">正確寫法</h4>
+
+<ul>
+<li>說明書應具體描述實現該功能的結構</li>
+<li>描述應該具體,不能含糊</li>
+<li><strong>不能用 Single Means Claim 形式</strong>(純功能性權利要求)</li>
+</ul>
+
+<hr>
+
+<h3 id="toc_90">2.5 最高人民法院司法解釋(2020)</h3>
+
+<h4 id="toc_91">功能性限定特徵的定義</h4>
+
+<p><strong>完整定義</strong>(2020 年版):</p>
+
+<blockquote>
+<p><q>對於結構特徵及相互之間的關係未加限定,僅限定所起的功能或效果,且所屬技術領域的技術人員僅通過閱讀權利要求,即可直接、明確地確定實現該功能或效果的具體實施方式的技術特徵</q></p>
+</blockquote>
+
+<p><strong>與 2016 年版差異</strong>:<br>
+- 新增「對於結構特徵及相互之間的關係未加限定」<br>
+- 更明確功能性限定的判斷標準</p>
+
+<hr>
+
+<h3 id="toc_92">2.6 充分揭露的法律後果</h3>
+
+<h4 id="toc_93">未公開具體實施方式</h4>
+
+<p><strong>法條適用</strong>:<br>
+- 說明書未公開任何能實現該功能或效果的具體實施方式<br>
+- → 違反《專利法》第26條第3款<br>
+- 權利要求不符合規定</p>
+
+<h4 id="toc_94">公開的實施方式不充分</h4>
+
+<p><strong>問題</strong>:<br>
+- 說明書公開的實施方式無法實現該功能<br>
+- 或與權利要求的技術方案不對應<br>
+- → 同樣違反第26條第3款</p>
+
+<hr>
+
+<h3 id="toc_95">2.7 功能性限定的判斷方法</h3>
+
+<h4 id="toc_96">判斷標準</h4>
+
+<p><strong>與美國的相似性</strong>:</p>
+
+<blockquote>
+<p><q>如果整句記載了足以實現該功能的充分結構,那它就不是功能限定</q></p>
+</blockquote>
+
+<p><strong>所屬技術領域人士的判斷</strong>:<br>
+- 僅通過閱讀權利要求<br>
+- 能否直接、明確地確定具體實施方式<br>
+- 如果可以 → 不是功能性限定<br>
+- 如果不可以 → 是功能性限定</p>
+
+<hr>
+
+<h3 id="toc_97">2.8 功能性限定特徵的範圍解釋</h3>
+
+<h4 id="toc_98">訴訟階段</h4>
+
+<p><strong>司法解釋</strong>:</p>
+
+<blockquote>
+<p><q>功能性限定特徵的內容,應當包括說明書和附圖中記載的所有實現該功能的具體實施方式,及所屬技術領域普通技術人員能夠想到的等同替代方式</q></p>
+</blockquote>
+
+<h4 id="toc_99">與美國的差異</h4>
+
+<table>
+<thead>
+<tr>
+<th>比較項目</th>
+<th>中國</th>
+<th>美國(MPF)</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>範圍基礎</td>
+<td>說明書<strong>所有</strong>實施方式</td>
+<td>說明書<strong>對應</strong>結構</td>
+</tr>
+<tr>
+<td>均等物</td>
+<td>所屬技術領域人員能想到的</td>
+<td>侵權時的均等</td>
+</tr>
+<tr>
+<td>時間點</td>
+<td>-</td>
+<td>公告時(文義範圍)</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>重點差異</strong>:<br>
+- 中國:說明書所有具體實施方式為基準<br>
+- 美國:說明書對應結構 + 其均等物</p>
+
+<hr>
+
+<h3 id="toc_100">2.9 中國與美國的主要差異總結</h3>
+
+<table>
+<thead>
+<tr>
+<th>比較項目</th>
+<th>美國(MPF)</th>
+<th>中國</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><strong>關鍵字依賴</strong></td>
+<td>強(<q>means</q>/<q>step</q>)</td>
+<td>弱(無特定關鍵字)</td>
+</tr>
+<tr>
+<td><strong>推定機制</strong></td>
+<td>有(基於關鍵字)</td>
+<td>無</td>
+</tr>
+<tr>
+<td><strong>判斷標準</strong></td>
+<td>結構描述充分性</td>
+<td>充分揭露 + PHOSITA 理解</td>
+</tr>
+<tr>
+<td><strong>範圍解釋</strong></td>
+<td>對應結構 + 均等物</td>
+<td>所有具體實施方式 + 等同替代</td>
+</tr>
+<tr>
+<td><strong>時間考量</strong></td>
+<td>有(公告時 vs 侵權時)</td>
+<td>無明確時間點區分</td>
+</tr>
+<tr>
+<td><strong>審查實務</strong></td>
+<td>推定原則明確</td>
+<td>審查員裁量權大</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h3 id="toc_101">2.10 台灣審查基準</h3>
+
+<h4 id="toc_102">與美國的相似性</h4>
+
+<p><strong>判斷流程</strong>:<br>
+1. 對應的結構、材料或動作<br>
+2. 執行相同功能?<br>
+   - 是 → 判斷是否相同或均等 → 文義侵權<br>
+3. 未執行相同功能 → 判斷侵權時是否符合<br>
+   - Way、Function、Result 是否實質相同<br>
+   - 是 → 均等侵權</p>
+
+<p><strong>結論</strong>:<br>
+- 台灣審查基準與美國判斷方式基本一致<br>
+- 區分文義範圍與均等範圍<br>
+- 有時間點考量(公告時 vs 侵權時)</p>
+
+<hr>
+
+<h2 id="toc_103">第三部分:實務撰寫建議</h2>
+
+<h3 id="toc_104">3.1 美國申請策略</h3>
+
+<h4 id="toc_105">避免觸發 MPF</h4>
+
+<p><strong>關鍵原則</strong>:增加結構性描述</p>
+
+<p><strong>不良寫法</strong>:<br>
+<code><br>
+❌ means for processing data<br>
+❌ module for processing data<br>
+</code></p>
+
+<p><strong>改良寫法</strong>:<br>
+<code><br>
+✓ processor configured to process data<br>
+✓ processing circuit configured to process data<br>
+</code></p>
+
+<p><strong>最佳寫法</strong>(結構 + 組成):<br>
+<code><br>
+✓ processor including a CPU and memory, configured to process data<br>
+✓ processing circuit comprising [具體電路元件], configured to...<br>
+</code></p>
+
+<h4 id="toc_106">說明書撰寫要點</h4>
+
+<p><strong>對應關係建立</strong>:<br>
+1. 每個功能性限定需在說明書找到對應實施方式<br>
+2. 明確標示結構元件與功能的關聯<br>
+3. 提供足夠實施例支持保護範圍</p>
+
+<p><strong>演算法描述</strong>:<br>
+- 針對電腦實現的發明<br>
+- 必須記載演算法、流程圖或指令組<br>
+- 填補從通用電腦基本功能到請求項功能的 GAP</p>
+
+<hr>
+
+<h3 id="toc_107">3.2 中國申請策略</h3>
+
+<h4 id="toc_108">說明書要求</h4>
+
+<p><strong>必要內容</strong>:<br>
+- <strong>具體實施例</strong>:至少一個完整的實施方式<br>
+- <strong>結構描述</strong>:避免單純功能性描述<br>
+- <strong>實現方式</strong>:確保所屬領域技術人員可實現</p>
+
+<p><strong>撰寫原則</strong>:<br>
+- 說明書詳細描述各種實施方式<br>
+- 不能僅寫「其他方式也可適用」<br>
+- 每個功能性特徵都需對應具體結構</p>
+
+<h4 id="toc_109">權利要求撰寫</h4>
+
+<p><strong>避免純功能性描述</strong>:<br>
+- 加入結構性限定<br>
+- 或用「更恰當」的功能限定(需論證)<br>
+- 確保功能可驗證</p>
+
+<hr>
+
+<h3 id="toc_110">3.3 跨國申請注意事項</h3>
+
+<h4 id="toc_111">美國申請重點</h4>
+
+<ol>
+<li><p><strong>謹慎使用術語</strong></p>
+
+<ul>
+<li>避免:means、module、unit、mechanism</li>
+<li>改用:processor、circuit、code、program</li>
+</ul></li>
+<li><p><strong>增加結構性描述詞</strong></p>
+
+<ul>
+<li>comprising、including</li>
+<li>具體元件描述</li>
+</ul></li>
+<li><p><strong>說明書詳細揭露</strong></p>
+
+<ul>
+<li>對應結構明確</li>
+<li>演算法完整</li>
+</ul></li>
+</ol>
+
+<h4 id="toc_112">中國申請重點</h4>
+
+<ol>
+<li><p><strong>說明書需有具體實施例</strong></p>
+
+<ul>
+<li>不能只寫原理</li>
+<li>需要完整實施方式</li>
+</ul></li>
+<li><p><strong>避免單純功能性描述</strong></p>
+
+<ul>
+<li>除非絕對必要</li>
+<li>且需充分論證</li>
+</ul></li>
+<li><p><strong>確保可實現性</strong></p>
+
+<ul>
+<li>所屬領域技術人員能理解</li>
+<li>能夠實際實施</li>
+</ul></li>
+</ol>
+
+<h4 id="toc_113">歐洲/日本</h4>
+
+<ul>
+<li><strong>歐洲</strong>:相對寬鬆,但仍需明確性</li>
+<li><strong>日本</strong>:介於美中之間,重視實施可能性</li>
+</ul>
+
+<hr>
+
+<h3 id="toc_114">3.4 多重保護策略範例</h3>
+
+<h4 id="toc_115">獨立項多項撰寫</h4>
+
+<p><strong>第一項</strong>:結構性限定<br>
+<code><br>
+1. 一種裝置,包含:<br>
+    處理電路,包括CPU與記憶體,該處理電路經組態以執行資料處理。<br>
+</code></p>
+
+<p><strong>第二項</strong>:軟體 code 寫法<br>
+<code><br>
+2. 一種裝置,包含:<br>
+    軟體程式碼,經組態以執行資料處理,該資料處理包括...<br>
+</code></p>
+
+<p><strong>第三項</strong>:功能混合結構<br>
+<code><br>
+3. 一種裝置,包含:<br>
+    處理器;及<br>
+    與該處理器耦接的記憶體,該記憶體儲存指令,當該指令被執行時,使該處理器執行...<br>
+</code></p>
+
+<hr>
+
+<h3 id="toc_116">3.5 審查答辯要點</h3>
+
+<h4 id="toc_117">美國 MPF 核駁</h4>
+
+<p><strong>答辯優先順序</strong>:<br>
+1. <strong>爭執適用性</strong>(不是 MPF)<br>
+   - 主張已有足夠結構<br>
+   - 引用判例(Intel v. Qualcomm)<br>
+   - 非 nonce word</p>
+
+<ol>
+<li><p><strong>修正說明</strong> (不建議修正請求項)</p>
+
+<ul>
+<li>透過意見書建立對應關係</li>
+<li>指出說明書支持段落</li>
+</ul></li>
+<li><p><strong>最後手段</strong>:限縮至具體實施例</p></li>
+</ol>
+
+<h4 id="toc_118">中國功能限定核駁</h4>
+
+<p><strong>常見核駁理由</strong>:<br>
+1. 權利要求保護範圍不清楚<br>
+2. 說明書揭露不充分<br>
+3. 無法確定具體技術方案</p>
+
+<p><strong>答辯方向</strong>:<br>
+1. 引用說明書具體段落<br>
+   - 證明充分揭露<br>
+2. 論證 PHOSITA 可理解並實現<br>
+3. 必要時修正為更具體的技術特徵</p>
+
+<hr>
+
+<h2 id="toc_119">附錄:關鍵術語對照</h2>
+
+<table>
+<thead>
+<tr>
+<th>英文</th>
+<th>中文</th>
+<th>說明</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Means-Plus-Function (MPF)</td>
+<td>手段功能用語</td>
+<td>35 USC §112(f)</td>
+</tr>
+<tr>
+<td>Functional Language</td>
+<td>功能性用語</td>
+<td>描述功能而非結構</td>
+</tr>
+<tr>
+<td>Structural Limitation</td>
+<td>結構性限定</td>
+<td>描述結構而非功能</td>
+</tr>
+<tr>
+<td>Nonce Word</td>
+<td>空泛字眼</td>
+<td>module、unit、mechanism 等</td>
+</tr>
+<tr>
+<td>Corresponding Structure</td>
+<td>對應結構</td>
+<td>說明書中實現功能的結構</td>
+</tr>
+<tr>
+<td>Equivalents Thereof</td>
+<td>其均等物</td>
+<td>MPF 文義範圍的一部分</td>
+</tr>
+<tr>
+<td>Doctrine of Equivalents (DOE)</td>
+<td>均等論</td>
+<td>均等侵權範圍</td>
+</tr>
+<tr>
+<td>Prosecution History Estoppel</td>
+<td>審查歷史禁反言</td>
+<td>修正導致的範圍限制</td>
+</tr>
+<tr>
+<td>Way-Function-Result Test</td>
+<td>三不測試法</td>
+<td>均等論判斷標準</td>
+</tr>
+<tr>
+<td>Enablement</td>
+<td>充分揭露/使能</td>
+<td>35 USC §112(a)</td>
+</tr>
+<tr>
+<td>Written Description</td>
+<td>書面描述</td>
+<td>35 USC §112(a)</td>
+</tr>
+<tr>
+<td>Definiteness</td>
+<td>明確性</td>
+<td>35 USC §112(b)</td>
+</tr>
+<tr>
+<td>Single Means Claim</td>
+<td>單一手段請求項</td>
+<td>特殊情況,不適用 §112(f)</td>
+</tr>
+<tr>
+<td>Algorithm</td>
+<td>演算法</td>
+<td>軟體結構的定義形式</td>
+</tr>
+<tr>
+<td>Person Having Ordinary Skill in the Art (PHOSITA)</td>
+<td>所屬技術領域具通常知識者</td>
+<td>判斷標準人</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2 id="toc_120">課程總結</h2>
+
+<h3 id="toc_121">核心要點</h3>
+
+<ol>
+<li><p><strong>功能性用語本身不違法</strong>,問題在於保護範圍的解釋與限制</p></li>
+<li><p><strong>美國 MPF 規則</strong>:</p>
+
+<ul>
+<li>有明確的推定機制(基於關鍵字)</li>
+<li>範圍限縮至說明書對應結構及其均等物</li>
+<li>文義範圍與均等範圍有時間點差異</li>
+</ul></li>
+<li><p><strong>中國功能性限定</strong>:</p>
+
+<ul>
+<li>無關鍵字推定,審查員裁量權大</li>
+<li>範圍基於說明書所有具體實施方式</li>
+<li>審查階段範圍極廣,容易被核駁</li>
+</ul></li>
+<li><p><strong>說明書充分揭露</strong>是兩國共同的核心要求</p></li>
+<li><p><strong>撰寫策略</strong>:</p>
+
+<ul>
+<li>結構性描述是避免 MPF 的關鍵</li>
+<li>多重保護策略(不同寫法包覆重要特徵)</li>
+<li>說明書必須充分對應權利要求</li>
+</ul></li>
+<li><p><strong>審查答辯</strong>:</p>
+
+<ul>
+<li>優先爭執適用性</li>
+<li>謹慎考慮修正的影響(審查歷史禁反言)</li>
+<li>建立說明書與請求項的對應關係</li>
+</ul></li>
+<li><p><strong>跨國申請</strong>:</p>
+
+<ul>
+<li>理解各國差異</li>
+<li>美國重視對應結構</li>
+<li>中國重視具體實施方式</li>
+<li>均需確保所屬領域技術人員可實現</li>
+</ul></li>
+</ol>
+
+<hr>
+
+<h2 id="toc_122">附錄 A: 112(f) MPF 判斷流程圖詳解</h2>
+
+<h3 id="toc_123">完整判斷流程</h3>
+
+<div><pre class="line-numbers"><code class="language-none">┌─────────────────────────────────────┐
+│ 請求項特徵記載 means/step for/        │
+│ 概括代位語，並記載其功能？             │
+└──────────┬──────────────────────┘
+             │
+      ┌──────┴──────┐
+      │ 是           │ 否
+      ↓              ↓
+推定適用112(f)    推定112(f)不適用
+      │              │
+      ↓              ↓
+記載實現該功能    記載實現該功能
+的充分結構？      的充分結構？
+      │              │
+  ┌───┴───┐      ┌───┴───┐
+  是       否        否       是
+  ↓        ↓         ↓        ↓
+不符合  符合      符合    不符合
+112(f)  112(f)    112(f)  112(f)</code></pre></div>
+
+<h3 id="toc_124">關鍵判斷點</h3>
+
+<p><strong>曾被視為概括代位語</strong>:<br>
+- Module for<br>
+- Device for<br>
+- Unit for<br>
+- Component for<br>
+- Element for<br>
+- Member for<br>
+- Apparatus for<br>
+- Machine for<br>
+- System for</p>
+
+<p><strong>曾被視為非概括代位語</strong>:<br>
+- Code<br>
+- Application<br>
+- Program<br>
+- User interface code<br>
+(其記載該程式執行的功能)</p>
+
+<hr>
+
+<h2 id="toc_125">附錄 B: 中國功能限定小結</h2>
+
+<h3 id="toc_126">審查階段</h3>
+
+<p><strong>範圍解釋</strong>:<br>
+- 功能特徵涵蓋所有能實現該功能的結構<br>
+- 容易出現對比文件<br>
+- 審查員裁量權大</p>
+
+<p><strong>實務困境</strong>:<br>
+- 特徵採用上位方式撰寫<br>
+- 審查階段很可能被要求修正為下位實施例<br>
+- 說明書必須記載具體實施方式</p>
+
+<h3 id="toc_127">訴訟階段</h3>
+
+<p><strong>範圍解釋</strong>:<br>
+- 要求相同功能與相同效果<br>
+- 範圍遠小於審查時的範圍<br>
+- 小於傳統結構特徵之等同範圍</p>
+
+<p><strong>侵權判斷標準</strong> (2016 司法解釋):<br>
+- 以<strong>基本相同的手段</strong><br>
+- 實現<strong>相同的功能</strong><br>
+- 達到<strong>相同的效果</strong></p>
+
+<h3 id="toc_128">建議</h3>
+
+<p><strong>就中國實務而言,似以結構特徵撰寫為宜</strong></p>
+
+<p>原因:<br>
+1. 審查階段範圍過廣,易被核駁<br>
+2. 訴訟階段範圍過窄,保護不足<br>
+3. 不如直接以結構特徵撰寫,範圍明確</p>
+
+<hr>
+
+<h2 id="toc_129">附錄 C: 重要參考文獻</h2>
+
+<h3 id="toc_130">美國判例</h3>
+
+<ol>
+<li><p><strong>Halliburton Oil Well Cementing Co. v. Walker</strong>, 329 U.S. 1 (1946)</p>
+
+<ul>
+<li>MPF 立法背景</li>
+</ul></li>
+<li><p><strong>Williamson v. Citrix Online, LLC</strong>, 792 F.3d 1339 (Fed. Cir. 2015) (en banc)</p>
+
+<ul>
+<li>確立 nonce word 可能觸發 MPF</li>
+</ul></li>
+<li><p><strong>Intel v. Qualcomm</strong>, (2020)</p>
+
+<ul>
+<li>修正 Williamson 過度擴張</li>
+</ul></li>
+<li><p><strong>Synchronoss Technologies, Inc. v. Dropbox, Inc.</strong>, 987 F.3d 1358 (Fed. Cir. 2021)</p>
+
+<ul>
+<li>使用者識別模組案例</li>
+</ul></li>
+<li><p><strong>Rain Computing, Inc. v. Samsung Electronics Co., Ltd.</strong>, 989 F.3d 1002 (Fed. Cir. 2021)</p>
+
+<ul>
+<li>存取控制功能案例</li>
+</ul></li>
+<li><p><strong>Ring &amp; Pinion Service Inc. v. ARB Corp. Ltd.</strong>, 743 F.3d 831 (Fed. Cir. 2014)</p>
+
+<ul>
+<li>公告後新技術的均等侵權</li>
+</ul></li>
+</ol>
+
+<h3 id="toc_131">中國法規</h3>
+
+<ol>
+<li><p><strong>專利審查指南</strong> 第二部分第二章 3.2.1</p>
+
+<ul>
+<li>功能性限定基本規定</li>
+</ul></li>
+<li><p><strong>最高人民法院司法解釋</strong> (2016)</p>
+
+<ul>
+<li>侵權判斷標準</li>
+</ul></li>
+<li><p><strong>最高人民法院司法解釋</strong> (2020)</p>
+
+<ul>
+<li>功能性特徵定義更新</li>
+</ul></li>
+</ol>
+
+<h3 id="toc_132">MPEP 章節</h3>
+
+<ol>
+<li><strong>MPEP 2114</strong> - Apparatus and Article Claims — Functional Language</li>
+<li><strong>MPEP 2173</strong> - (相關章節)</li>
+<li><strong>MPEP 2181</strong> - 112(f) 判斷流程
+
+<ul>
+<li>V. SINGLE MEANS CLAIMS</li>
+</ul></li>
+</ol>
+
+<h3 id="toc_133">USPTO 文件</h3>
+
+<ol>
+<li><strong>USPTO 2024/03/18 Memorandum</strong>
+
+<ul>
+<li>MPF 審查資源及重點提醒</li>
+</ul></li>
+</ol>
+
+<hr>
+
+<h2 id="toc_134">附錄 D: 課程講師資訊</h2>
+
+<p><strong>講師</strong>: Jamie Lu (盧建川)<br><br>
+<strong>職稱</strong>: 廣流智權事務所 副所長<br><br>
+<strong>資格</strong>:<br>
+- 台灣專利師<br>
+- 大陸專利代理師<br>
+- 美國專利代理人 (non-registered)</p>
+
+<p><strong>課程日期</strong>: 2025年3月5日<br><br>
+<strong>課程主題</strong>: US及CN之功能限定 (含US MPF, means plus function)</p>
+
+<p><strong>參考資源</strong>:<br>
+- 廣流智權事務所網站: http://www.widebandip.com<br>
+- 相關評析文章已發布於事務所知識分享區</p>
+
+<hr>
+
+<h2 id="toc_135">附錄 E: 實務檢查清單</h2>
+
+<h3 id="toc_136">撰寫階段檢查</h3>
+
+<p><strong>美國申請</strong>:<br>
+- [ ] 避免使用 means、module、unit 等概括代位語<br>
+- [ ] 功能性描述搭配結構性限定<br>
+- [ ] 說明書記載演算法或流程圖(電腦實現)<br>
+- [ ] 每個功能特徵都有對應結構<br>
+- [ ] 考慮使用 code/program 寫法</p>
+
+<p><strong>中國申請</strong>:<br>
+- [ ] 說明書記載具體實施方式<br>
+- [ ] 避免純功能性描述<br>
+- [ ] 確保所屬領域技術人員可實現<br>
+- [ ] 提供足夠實施例</p>
+
+<h3 id="toc_137">審查答辯檢查</h3>
+
+<p><strong>收到 MPF 核駁時</strong>:<br>
+- [ ] 評估是否修正請求項(通常不建議)<br>
+- [ ] 爭執 MPF 適用性<br>
+- [ ] 指出說明書對應段落<br>
+- [ ] 引用相關判例(Intel v. Qualcomm 等)<br>
+- [ ] 考慮審查歷史禁反言影響</p>
+
+<p><strong>中國功能限定核駁</strong>:<br>
+- [ ] 引用說明書具體段落<br>
+- [ ] 論證 PHOSITA 可理解<br>
+- [ ] 必要時修正為具體技術特徵</p>
+
+<hr>
+
+<p><strong>文件編制日期</strong>: 2025年3月5日<br><br>
+<strong>原始課程日期</strong>: 2025年3月5日<br><br>
+<strong>講師</strong>: Jamie Lu (盧建川)<br><br>
+<strong>整理者</strong>: Claude (基於課程逐字稿與 PDF 投影片)<br><br>
+<strong>文件狀態</strong>: 完整版課程整理 (含 PDF 補充)</p>
+
+
+
+<script type="text/javascript">
+var _self="undefined"!=typeof window?window:"undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?self:{},Prism=function(){var e=/\blang(?:uage)?-(\w+)\b/i,t=0,n=_self.Prism={util:{encode:function(e){return e instanceof a?new a(e.type,n.util.encode(e.content),e.alias):"Array"===n.util.type(e)?e.map(n.util.encode):e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\u00a0/g," ")},type:function(e){return Object.prototype.toString.call(e).match(/\[object (\w+)\]/)[1]},objId:function(e){return e.__id||Object.defineProperty(e,"__id",{value:++t}),e.__id},clone:function(e){var t=n.util.type(e);switch(t){case"Object":var a={};for(var r in e)e.hasOwnProperty(r)&&(a[r]=n.util.clone(e[r]));return a;case"Array":return e.map&&e.map(function(e){return n.util.clone(e)})}return e}},languages:{extend:function(e,t){var a=n.util.clone(n.languages[e]);for(var r in t)a[r]=t[r];return a},insertBefore:function(e,t,a,r){r=r||n.languages;var l=r[e];if(2==arguments.length){a=arguments[1];for(var i in a)a.hasOwnProperty(i)&&(l[i]=a[i]);return l}var o={};for(var s in l)if(l.hasOwnProperty(s)){if(s==t)for(var i in a)a.hasOwnProperty(i)&&(o[i]=a[i]);o[s]=l[s]}return n.languages.DFS(n.languages,function(t,n){n===r[e]&&t!=e&&(this[t]=o)}),r[e]=o},DFS:function(e,t,a,r){r=r||{};for(var l in e)e.hasOwnProperty(l)&&(t.call(e,l,e[l],a||l),"Object"!==n.util.type(e[l])||r[n.util.objId(e[l])]?"Array"!==n.util.type(e[l])||r[n.util.objId(e[l])]||(r[n.util.objId(e[l])]=!0,n.languages.DFS(e[l],t,l,r)):(r[n.util.objId(e[l])]=!0,n.languages.DFS(e[l],t,null,r)))}},plugins:{},highlightAll:function(e,t){var a={callback:t,selector:'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'};n.hooks.run("before-highlightall",a);for(var r,l=a.elements||document.querySelectorAll(a.selector),i=0;r=l[i++];)n.highlightElement(r,e===!0,a.callback)},highlightElement:function(t,a,r){for(var l,i,o=t;o&&!e.test(o.className);)o=o.parentNode;o&&(l=(o.className.match(e)||[,""])[1],i=n.languages[l]),t.className=t.className.replace(e,"").replace(/\s+/g," ")+" language-"+l,o=t.parentNode,/pre/i.test(o.nodeName)&&(o.className=o.className.replace(e,"").replace(/\s+/g," ")+" language-"+l);var s=t.textContent,u={element:t,language:l,grammar:i,code:s};if(!s||!i)return n.hooks.run("complete",u),void 0;if(n.hooks.run("before-highlight",u),a&&_self.Worker){var c=new Worker(n.filename);c.onmessage=function(e){u.highlightedCode=e.data,n.hooks.run("before-insert",u),u.element.innerHTML=u.highlightedCode,r&&r.call(u.element),n.hooks.run("after-highlight",u),n.hooks.run("complete",u)},c.postMessage(JSON.stringify({language:u.language,code:u.code,immediateClose:!0}))}else u.highlightedCode=n.highlight(u.code,u.grammar,u.language),n.hooks.run("before-insert",u),u.element.innerHTML=u.highlightedCode,r&&r.call(t),n.hooks.run("after-highlight",u),n.hooks.run("complete",u)},highlight:function(e,t,r){var l=n.tokenize(e,t);return a.stringify(n.util.encode(l),r)},tokenize:function(e,t){var a=n.Token,r=[e],l=t.rest;if(l){for(var i in l)t[i]=l[i];delete t.rest}e:for(var i in t)if(t.hasOwnProperty(i)&&t[i]){var o=t[i];o="Array"===n.util.type(o)?o:[o];for(var s=0;s<o.length;++s){var u=o[s],c=u.inside,g=!!u.lookbehind,h=!!u.greedy,f=0,d=u.alias;u=u.pattern||u;for(var p=0;p<r.length;p++){var m=r[p];if(r.length>e.length)break e;if(!(m instanceof a)){u.lastIndex=0;var y=u.exec(m),v=1;if(!y&&h&&p!=r.length-1){var b=r[p+1].matchedStr||r[p+1],k=m+b;if(p<r.length-2&&(k+=r[p+2].matchedStr||r[p+2]),u.lastIndex=0,y=u.exec(k),!y)continue;var w=y.index+(g?y[1].length:0);if(w>=m.length)continue;var _=y.index+y[0].length,P=m.length+b.length;if(v=3,P>=_){if(r[p+1].greedy)continue;v=2,k=k.slice(0,P)}m=k}if(y){g&&(f=y[1].length);var w=y.index+f,y=y[0].slice(f),_=w+y.length,S=m.slice(0,w),O=m.slice(_),j=[p,v];S&&j.push(S);var A=new a(i,c?n.tokenize(y,c):y,d,y,h);j.push(A),O&&j.push(O),Array.prototype.splice.apply(r,j)}}}}}return r},hooks:{all:{},add:function(e,t){var a=n.hooks.all;a[e]=a[e]||[],a[e].push(t)},run:function(e,t){var a=n.hooks.all[e];if(a&&a.length)for(var r,l=0;r=a[l++];)r(t)}}},a=n.Token=function(e,t,n,a,r){this.type=e,this.content=t,this.alias=n,this.matchedStr=a||null,this.greedy=!!r};if(a.stringify=function(e,t,r){if("string"==typeof e)return e;if("Array"===n.util.type(e))return e.map(function(n){return a.stringify(n,t,e)}).join("");var l={type:e.type,content:a.stringify(e.content,t,r),tag:"span",classes:["token",e.type],attributes:{},language:t,parent:r};if("comment"==l.type&&(l.attributes.spellcheck="true"),e.alias){var i="Array"===n.util.type(e.alias)?e.alias:[e.alias];Array.prototype.push.apply(l.classes,i)}n.hooks.run("wrap",l);var o="";for(var s in l.attributes)o+=(o?" ":"")+s+'="'+(l.attributes[s]||"")+'"';return"<"+l.tag+' class="'+l.classes.join(" ")+'" '+o+">"+l.content+"</"+l.tag+">"},!_self.document)return _self.addEventListener?(_self.addEventListener("message",function(e){var t=JSON.parse(e.data),a=t.language,r=t.code,l=t.immediateClose;_self.postMessage(n.highlight(r,n.languages[a],a)),l&&_self.close()},!1),_self.Prism):_self.Prism;var r=document.currentScript||[].slice.call(document.getElementsByTagName("script")).pop();return r&&(n.filename=r.src,document.addEventListener&&!r.hasAttribute("data-manual")&&document.addEventListener("DOMContentLoaded",n.highlightAll)),_self.Prism}();"undefined"!=typeof module&&module.exports&&(module.exports=Prism),"undefined"!=typeof global&&(global.Prism=Prism);
+</script>
+
+<script type="text/javascript">
+!function(){"undefined"!=typeof self&&self.Prism&&self.document&&Prism.hooks.add("complete",function(e){if(e.code){var t=e.element.parentNode,s=/\s*\bline-numbers\b\s*/;if(t&&/pre/i.test(t.nodeName)&&(s.test(t.className)||s.test(e.element.className))&&!e.element.querySelector(".line-numbers-rows")){s.test(e.element.className)&&(e.element.className=e.element.className.replace(s,"")),s.test(t.className)||(t.className+=" line-numbers");var n,a=e.code.match(/\n(?!$)/g),l=a?a.length+1:1,m=new Array(l+1);m=m.join("<span></span>"),n=document.createElement("span"),n.className="line-numbers-rows",n.innerHTML=m,t.hasAttribute("data-start")&&(t.style.counterReset="linenumber "+(parseInt(t.getAttribute("data-start"),10)-1)),e.element.appendChild(n)}}})}();
+</script>
+
+<script type="text/x-mathjax-config">
+(function () {
+
+MathJax.Hub.Config({
+	'showProcessingMessages': false,
+	'messageStyle': 'none'
+});
+
+if (typeof MathJaxListener !== 'undefined') {
+	MathJax.Hub.Register.StartupHook('End', function () {
+		MathJaxListener.invokeCallbackForKey_('End');
+	});
+}
+
+})();
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+</body>
+
+</html>

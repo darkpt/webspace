@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Gesture Particle System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #video {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 200px;
+            height: 150px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            z-index: 10;
+            transform: scaleX(-1);
+        }
+
+        #control-panel {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(20, 20, 30, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            z-index: 10;
+            min-width: 250px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #aaa;
+            text-transform: uppercase;
+        }
+
+        .shape-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .shape-btn {
+            padding: 10px;
+            background: rgba(100, 100, 255, 0.2);
+            border: 1px solid rgba(100, 100, 255, 0.5);
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 11px;
+        }
+
+        .shape-btn:hover {
+            background: rgba(100, 100, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .shape-btn.active {
+            background: rgba(100, 100, 255, 0.6);
+            border-color: rgba(150, 150, 255, 1);
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #status {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 6px;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(20, 20, 30, 0.95);
+            padding: 30px 50px;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <h2>初始化系統中...</h2>
+        <div class="spinner"></div>
+        <p id="loading-text">載入手勢識別模型</p>
+    </div>
+
+    <div id="canvas-container"></div>
+    <video id="video" autoplay playsinline></video>
+
+    <div id="control-panel">
+        <h3 style="margin-bottom: 15px; font-size: 14px;">粒子控制面板</h3>
+        
+        <div class="control-group">
+            <label>粒子形狀</label>
+            <div class="shape-buttons">
+                <button class="shape-btn active" data-shape="saturn">土星</button>
+                <button class="shape-btn" data-shape="fireworks">煙火</button>
+                <button class="shape-btn" data-shape="magic">魔法陣</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>粒子顏色</label>
+            <input type="color" id="color-picker" value="#4488ff">
+        </div>
+
+        <div id="status">
+            <div class="status-item">
+                <span>手勢狀態:</span>
+                <span class="status-value" id="gesture-status">等待偵測</span>
+            </div>
+            <div class="status-item">
+                <span>粒子縮放:</span>
+                <span class="status-value" id="scale-status">1.00x</span>
+            </div>
+            <div class="status-item">
+                <span>靜止計時:</span>
+                <span class="status-value" id="still-timer">0.0s</span>
+            </div>
+            <div class="status-item">
+                <span>FPS:</span>
+                <span class="status-value" id="fps-counter">--</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose@0.0.7"></script>
+
+    <script>
+        // ==================== 全域變數 ====================
+        let scene, camera, renderer, particles;
+        let handposeModel, video;
+        let currentShape = 'saturn';
+        let currentColor = 0x4488ff;
+        let targetScale = 1.0;
+        let currentScale = 1.0;
+        let stillTimer = 0;
+        let lastHandPositions = [];
+        let isHandStill = false;
+        let magicCircleActive = false;
+
+        const PARTICLE_COUNT = 10000;
+        const TARGET_FPS = 30;
+        const FRAME_DURATION = 1000 / TARGET_FPS;
+        const STILL_THRESHOLD = 10; // px
+        const STILL_DURATION = 3000; // ms
+
+        // ==================== 初始化 ====================
+        async function init() {
+            updateLoadingText('設定 Three.js 場景...');
+            setupThreeJS();
+            
+            updateLoadingText('請求攝影機權限...');
+            await setupCamera();
+            
+            updateLoadingText('載入手勢識別模型...');
+            await loadHandposeModel();
+            
+            updateLoadingText('生成粒子系統...');
+            createParticles(currentShape);
+            
+            setupUI();
+            hideLoading();
+            animate();
+        }
+
+        function updateLoadingText(text) {
+            document.getElementById('loading-text').textContent = text;
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // ==================== Three.js 設定 ====================
+        function setupThreeJS() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+
+            camera = new THREE.PerspectiveCamera(
+                75,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+            camera.position.z = 300;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // 環境光
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            // 響應式調整
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // ==================== 攝影機設定 ====================
+        async function setupCamera() {
+            video = document.getElementById('video');
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                });
+                video.srcObject = stream;
+                
+                return new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        resolve();
+                    };
+                });
+            } catch (error) {
+                alert('無法訪問攝影機：' + error.message);
+                throw error;
+            }
+        }
+
+        // ==================== HandPose 模型載入 ====================
+        async function loadHandposeModel() {
+            handposeModel = await handpose.load();
+        }
+
+        // ==================== 粒子形狀生成器 ====================
+        function generateSaturnPositions() {
+            const positions = [];
+            
+            // 球體（土星本體）
+            for (let i = 0; i < PARTICLE_COUNT * 0.6; i++) {
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(Math.random() * 2 - 1);
+                const r = 80 + Math.random() * 20;
+                
+                positions.push(
+                    r * Math.sin(phi) * Math.cos(theta),
+                    r * Math.sin(phi) * Math.sin(theta),
+                    r * Math.cos(phi)
+                );
+            }
+            
+            // 環（土星環）
+            for (let i = 0; i < PARTICLE_COUNT * 0.4; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 120 + Math.random() * 40;
+                const thickness = (Math.random() - 0.5) * 5;
+                
+                positions.push(
+                    Math.cos(angle) * radius,
+                    thickness,
+                    Math.sin(angle) * radius
+                );
+            }
+            
+            return new Float32Array(positions);
+        }
+
+        function generateFireworksPositions() {
+            const positions = [];
+            const explosionCount = 5;
+            
+            for (let e = 0; e < explosionCount; e++) {
+                const centerX = (Math.random() - 0.5) * 200;
+                const centerY = (Math.random() - 0.5) * 200;
+                const centerZ = (Math.random() - 0.5) * 200;
+                
+                for (let i = 0; i < PARTICLE_COUNT / explosionCount; i++) {
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.acos(Math.random() * 2 - 1);
+                    const r = Math.random() * 60;
+                    
+                    positions.push(
+                        centerX + r * Math.sin(phi) * Math.cos(theta),
+                        centerY + r * Math.sin(phi) * Math.sin(theta),
+                        centerZ + r * Math.cos(phi)
+                    );
+                }
+            }
+            
+            return new Float32Array(positions);
+        }
+
+        function generateMagicCirclePositions() {
+            const positions = [];
+            
+            // 外圈
+            for (let i = 0; i < PARTICLE_COUNT * 0.3; i++) {
+                const angle = (i / (PARTICLE_COUNT * 0.3)) * Math.PI * 2;
+                const radius = 120;
+                positions.push(
+                    Math.cos(angle) * radius,
+                    0,
+                    Math.sin(angle) * radius
+                );
+            }
+            
+            // 中圈
+            for (let i = 0; i < PARTICLE_COUNT * 0.25; i++) {
+                const angle = (i / (PARTICLE_COUNT * 0.25)) * Math.PI * 2;
+                const radius = 80;
+                positions.push(
+                    Math.cos(angle) * radius,
+                    0,
+                    Math.sin(angle) * radius
+                );
+            }
+            
+            // 內圈
+            for (let i = 0; i < PARTICLE_COUNT * 0.2; i++) {
+                const angle = (i / (PARTICLE_COUNT * 0.2)) * Math.PI * 2;
+                const radius = 40;
+                positions.push(
+                    Math.cos(angle) * radius,
+                    0,
+                    Math.sin(angle) * radius
+                );
+            }
+            
+            // 符號線條
+            for (let i = 0; i < PARTICLE_COUNT * 0.25; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = Math.random() * 120;
+                positions.push(
+                    Math.cos(angle) * radius,
+                    0,
+                    Math.sin(angle) * radius
+                );
+            }
+            
+            return new Float32Array(positions);
+        }
+
+        // ==================== 粒子系統創建 ====================
+        function createParticles(shape) {
+            if (particles) {
+                scene.remove(particles);
+                particles.geometry.dispose();
+                particles.material.dispose();
+            }
+
+            let positions;
+            switch(shape) {
+                case 'saturn':
+                    positions = generateSaturnPositions();
+                    break;
+                case 'fireworks':
+                    positions = generateFireworksPositions();
+                    break;
+                case 'magic':
+                    positions = generateMagicCirclePositions();
+                    break;
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const material = new THREE.PointsMaterial({
+                color: currentColor,
+                size: 2,
+                sizeAttenuation: true,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+        }
+
+        // ==================== 手勢偵測 ====================
+        async function detectHands() {
+            if (!handposeModel || !video.readyState === 4) return null;
+            
+            try {
+                const predictions = await handposeModel.estimateHands(video);
+                return predictions;
+            } catch (error) {
+                console.error('手勢偵測錯誤:', error);
+                return null;
+            }
+        }
+
+        function calculateHandOpenness(landmarks) {
+            if (!landmarks || landmarks.length < 21) return 0;
+            
+            // 計算手指尖端到手掌中心的平均距離
+            const palmCenter = landmarks[0]; // 手腕
+            const fingerTips = [4, 8, 12, 16, 20]; // 五指尖端
+            
+            let totalDistance = 0;
+            fingerTips.forEach(tipIndex => {
+                const tip = landmarks[tipIndex];
+                const dist = Math.sqrt(
+                    Math.pow(tip[0] - palmCenter[0], 2) +
+                    Math.pow(tip[1] - palmCenter[1], 2)
+                );
+                totalDistance += dist;
+            });
+            
+            const avgDistance = totalDistance / fingerTips.length;
+            return avgDistance;
+        }
+
+        function isHandMoving(currentPositions) {
+            if (lastHandPositions.length === 0) {
+                lastHandPositions = currentPositions;
+                return true;
+            }
+            
+            let totalMovement = 0;
+            currentPositions.forEach((hand, idx) => {
+                if (lastHandPositions[idx]) {
+                    const dx = hand[0] - lastHandPositions[idx][0];
+                    const dy = hand[1] - lastHandPositions[idx][1];
+                    totalMovement += Math.sqrt(dx * dx + dy * dy);
+                }
+            });
+            
+            lastHandPositions = currentPositions;
+            return totalMovement > STILL_THRESHOLD;
+        }
+
+        // ==================== UI 控制 ====================
+        function setupUI() {
+            // 形狀切換
+            document.querySelectorAll('.shape-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentShape = btn.dataset.shape;
+                    createParticles(currentShape);
+                    magicCircleActive = false;
+                    stillTimer = 0;
+                });
+            });
+
+            // 顏色選擇
+            document.getElementById('color-picker').addEventListener('input', (e) => {
+                currentColor = parseInt(e.target.value.replace('#', '0x'));
+                if (particles) {
+                    particles.material.color.setHex(currentColor);
+                }
+            });
+        }
+
+        // ==================== 動畫循環 ====================
+        let lastTime = performance.now();
+        let fpsHistory = [];
+
+        async function animate() {
+            const currentTime = performance.now();
+            const deltaTime = currentTime - lastTime;
+
+            // FPS 限制
+            if (deltaTime < FRAME_DURATION) {
+                requestAnimationFrame(animate);
+                return;
+            }
+
+            lastTime = currentTime - (deltaTime % FRAME_DURATION);
+
+            // FPS 計算
+            const fps = Math.round(1000 / deltaTime);
+            fpsHistory.push(fps);
+            if (fpsHistory.length > 10) fpsHistory.shift();
+            const avgFps = Math.round(fpsHistory.reduce((a, b) => a + b) / fpsHistory.length);
+            document.getElementById('fps-counter').textContent = avgFps;
+
+            // 手勢偵測
+            const hands = await detectHands();
+            
+            if (hands && hands.length > 0) {
+                const hand = hands[0];
+                const openness = calculateHandOpenness(hand.landmarks);
+                
+                // 映射手勢到縮放比例 (0.5x - 2x)
+                targetScale = 0.5 + (openness / 100) * 1.5;
+                targetScale = Math.max(0.5, Math.min(2.0, targetScale));
+                
+                // 手勢狀態顯示
+                const gestureStatus = openness > 80 ? '張開手掌' : openness < 50 ? '握拳' : '部分張開';
+                document.getElementById('gesture-status').textContent = gestureStatus;
+                
+                // 靜止檢測
+                const handPositions = hands.map(h => [h.landmarks[0][0], h.landmarks[0][1]]);
+                if (!isHandMoving(handPositions)) {
+                    stillTimer += deltaTime;
+                    if (stillTimer >= STILL_DURATION && !magicCircleActive) {
+                        magicCircleActive = true;
+                        createParticles('magic');
+                        document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+                        document.querySelector('[data-shape="magic"]').classList.add('active');
+                    }
+                } else {
+                    stillTimer = 0;
+                    if (magicCircleActive) {
+                        magicCircleActive = false;
+                    }
+                }
+            } else {
+                document.getElementById('gesture-status').textContent = '未偵測到手部';
+                stillTimer = 0;
+            }
+
+            // 更新狀態顯示
+            document.getElementById('scale-status').textContent = currentScale.toFixed(2) + 'x';
+            document.getElementById('still-timer').textContent = (stillTimer / 1000).toFixed(1) + 's';
+
+            // 平滑縮放
+            currentScale += (targetScale - currentScale) * 0.1;
+            if (particles) {
+                particles.scale.set(currentScale, currentScale, currentScale);
+                particles.rotation.y += 0.001;
+                
+                if (currentShape === 'magic' && magicCircleActive) {
+                    particles.rotation.y += 0.01;
+                }
+            }
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+
+        // ==================== 啟動 ====================
+        init().catch(error => {
+            console.error('初始化失敗:', error);
+            alert('系統初始化失敗，請重新整理頁面');
+        });
+    </script>
+</body>
+</html>

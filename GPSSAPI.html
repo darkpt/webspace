@@ -62,30 +62,40 @@ sendBtn.addEventListener('click', async () => {
     statusMsg.textContent = '正在透過公共代理伺服器連線...';
     resultDisplay.textContent = '讀取中...';
 
-    try {
-        const response = await fetch(proxyUrl);
-        
-        if (!response.ok) {
-            throw new Error(`代理服務回應失敗: ${response.status}`);
-        }
+// ... 前段 fetch 程式碼保持不變 ...
 
-        const wrapperData = await response.json();
-        
-        // allorigins 會把原始資料放在 contents 欄位中
-        // 如果原始資料是 JSON 字串，我們需要再解析一次
-        const data = JSON.parse(wrapperData.contents);
-        
-        statusMsg.textContent = '成功繞過 CORS 取得資料！';
-        resultDisplay.textContent = JSON.stringify(data, null, 4);
+try {
+    const response = await fetch(proxyUrl);
+    if (!response.ok) throw new Error(`連線錯誤: ${response.status}`);
 
-    } catch (error) {
-        statusMsg.textContent = '連線失敗。';
-        resultDisplay.textContent = 
-            '【錯誤訊息】\n' + error.message + 
-            '\n\n【提示】\n' +
-            '1. 請檢查您的 API 網址是否正確。\n' +
-            '2. 公共代理伺服器有流量限制，若失敗請稍後再試。';
+    const wrapperData = await response.json();
+    
+    // 如果您使用公共代理 allorigins，資料在 .contents 中，需先轉為物件
+    const data = typeof wrapperData.contents === 'string' 
+                 ? JSON.parse(wrapperData.contents) 
+                 : wrapperData;
+
+    // 1. 定義提取路徑 (使用可選鏈 ?. 確保程式不會因為欄位缺失而崩潰)
+    const patentList = data['gpss-API']?.patent?.patentcontent;
+
+    if (patentList && Array.isArray(patentList)) {
+        // 2. 提取所有 doc-number
+        const docNumbers = patentList.map(item => {
+            return item['publication-reference']?.['doc-number'] || '無證號資料';
+        });
+
+        // 3. 顯示結果：將陣列轉為以換行分隔的字串
+        statusMsg.textContent = `成功！共找到 ${docNumbers.length} 筆證號：`;
+        resultDisplay.textContent = docNumbers.join('\n');
+    } else {
+        statusMsg.textContent = '查詢成功，但找不到專利內容。';
+        resultDisplay.textContent = '回傳格式可能不包含專利清單。';
     }
+
+} catch (error) {
+    statusMsg.textContent = '解析資料失敗。';
+    resultDisplay.textContent = '錯誤資訊：' + error.message;
+}
 });
 </script>
 

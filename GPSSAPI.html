@@ -48,50 +48,45 @@
     const resultDisplay = document.getElementById('result-display');
     const statusMsg = document.getElementById('statusMsg');
 
-    sendBtn.addEventListener('click', async () => {
-        // 1. 取得網址並處理可能的中文編碼問題
-        const rawUrl = apiUrlInput.value.trim();
-        if (!rawUrl) {
-            alert('請輸入網址');
-            return;
+sendBtn.addEventListener('click', async () => {
+    const rawUrl = apiUrlInput.value.trim();
+    if (!rawUrl) {
+        alert('請輸入網址');
+        return;
+    }
+
+    // --- 關鍵修改：使用 allorigins 公共代理服務 ---
+    // 這會將您的請求包裝起來，由 allorigins 的伺服器代為發送
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rawUrl)}`;
+
+    statusMsg.textContent = '正在透過公共代理伺服器連線...';
+    resultDisplay.textContent = '讀取中...';
+
+    try {
+        const response = await fetch(proxyUrl);
+        
+        if (!response.ok) {
+            throw new Error(`代理服務回應失敗: ${response.status}`);
         }
 
-        // 使用 encodeURI 處理網址中的中文（如：太陽能）
-        const encodedUrl = encodeURI(rawUrl);
+        const wrapperData = await response.json();
+        
+        // allorigins 會把原始資料放在 contents 欄位中
+        // 如果原始資料是 JSON 字串，我們需要再解析一次
+        const data = JSON.parse(wrapperData.contents);
+        
+        statusMsg.textContent = '成功繞過 CORS 取得資料！';
+        resultDisplay.textContent = JSON.stringify(data, null, 4);
 
-        statusMsg.textContent = '正在連線至 TIPO 伺服器...';
-        resultDisplay.textContent = '讀取中...';
-
-        try {
-            // 2. 發送請求
-            const response = await fetch(encodedUrl, {
-                method: 'GET',
-                mode: 'cors' // 強制開啟跨域模式
-            });
-
-            // 3. 檢查狀態碼
-            if (!response.ok) {
-                throw new Error(`HTTP 錯誤! 狀態碼: ${response.status}`);
-            }
-
-            // 4. 解析 JSON
-            const data = await response.json();
-            statusMsg.textContent = '資料取得成功！';
-            resultDisplay.textContent = JSON.stringify(data, null, 4);
-
-        } catch (error) {
-            // 5. 錯誤處理 (特別針對 CORS)
-            statusMsg.textContent = '連線失敗。';
-            resultDisplay.textContent = 
-                '【錯誤訊息】\n' + error.message + 
-                '\n\n【可能原因】\n' +
-                '1. 驗證碼 (userCode) 無效或過期。\n' +
-                '2. 瀏覽器 CORS 安全限制 (不允許從本地開啟的檔案存取政府 API)。\n' +
-                '3. 網路連線問題。';
-            
-            console.error('詳細錯誤資訊:', error);
-        }
-    });
+    } catch (error) {
+        statusMsg.textContent = '連線失敗。';
+        resultDisplay.textContent = 
+            '【錯誤訊息】\n' + error.message + 
+            '\n\n【提示】\n' +
+            '1. 請檢查您的 API 網址是否正確。\n' +
+            '2. 公共代理伺服器有流量限制，若失敗請稍後再試。';
+    }
+});
 </script>
 
 </body>

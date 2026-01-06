@@ -79,6 +79,7 @@ try {
     const patentList = data['gpss-API']?.patent?.patentcontent;
 
     if (patentList && Array.isArray(patentList)) {
+        const baseUrl = "https://patents.google.com/patent/";
         // 2. 提取所有 doc-number
         const docNumbers = patentList.map(item => {
             return item['publication-reference']?.['doc-number'] || '無證號資料';
@@ -86,7 +87,7 @@ try {
 
         // 3. 顯示結果：將陣列轉為以換行分隔的字串
         statusMsg.textContent = `成功！共找到 ${docNumbers.length} 筆證號：`;
-        resultDisplay.textContent = docNumbers.join('\n');
+        resultDisplay.textContent = docNumbers.map(num => `https://patents.google.com/patent/${num}/`).join('\n');
     } else {
         statusMsg.textContent = '查詢成功，但找不到專利內容。';
         resultDisplay.textContent = '回傳格式可能不包含專利清單。';
@@ -97,6 +98,12 @@ try {
     resultDisplay.textContent = '錯誤資訊：' + error.message;
 }
 });
+    function copyResult() {
+    const text = document.getElementById('result-display').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('已成功複製所有連結！');
+    });
+}
 </script>
 
 </body>

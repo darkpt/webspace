@@ -36,6 +36,7 @@
         <label for="apiUrl">請輸入完整 API 網址：</label>
         <input type="text" id="apiUrl" value="https://tiponet.tipo.gov.tw/gpss1/gpsskmc/gpss_api?userCode=您的驗證碼&patDB=TWA,TWB&patAG=A,B&patTY=I&TI=太陽能&ID=20150101:20160101&expFld=PN,AN,ID,AD,TI&expFmt=json&expQty=100">
         <button id="sendBtn">開始獲取專利資料</button>
+        <button id="copyResult">複製列表</button>
     </div>
 
     <div class="status-msg" id="statusMsg">等待指令...</div>
@@ -47,6 +48,7 @@
     const apiUrlInput = document.getElementById('apiUrl');
     const resultDisplay = document.getElementById('result-display');
     const statusMsg = document.getElementById('statusMsg');
+    const copyResult = document.getElementById('copyResult');
 
 sendBtn.addEventListener('click', async () => {
     const rawUrl = apiUrlInput.value.trim();

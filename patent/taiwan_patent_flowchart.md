@@ -201,10 +201,10 @@ flowchart TD
     E8 --> End2
     
     %% 樣式定義
-    classDef startEnd fill:#90EE90,stroke:#333,stroke-width:3px
-    classDef process fill:#87CEEB,stroke:#333,stroke-width:2px
-    classDef decision fill:#FFD700,stroke:#333,stroke-width:2px
-    classDef termination fill:#FF6B6B,stroke:#333,stroke-width:2px
+    classDef startEnd fill:#90EE90,stroke:#333,stroke-width:3px, color:#000000, font-size:28px
+    classDef process fill:#87CEEB,stroke:#333,stroke-width:2px, color:#000000, font-size:28px
+    classDef decision fill:#FFD700,stroke:#333,stroke-width:2px, color:#000000, font-size:28px
+    classDef termination fill:#FF6B6B,stroke:#333,stroke-width:2px, color:#000000, font-size:28px
     
     class Start,End1 startEnd
     class A1,A3,A4,A8,A9,A11,A13,A15,A16,A17,B1,B4,B6,B8,B10,B14,C3,C4,C5,C9,C11,D1,D2,E2,E4,E7 process

@@ -91,9 +91,9 @@ flowchart TD
     N -.失權.-> End2([程序終結])
     T -.失權.-> End2
 
-    style N fill:#ffcccc
-    style T fill:#ffcccc
-    style End2 fill:#ffcccc
+    style N fill:#ffffcc
+    style T fill:#ffffcc
+    style End2 fill:#ffffcc
 ```
 
 ---

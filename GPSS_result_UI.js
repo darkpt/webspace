@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name         TIPO 專利內文現代化重構 (V3.6 彈窗旋轉功能版)
-// @namespace    https://github.com/darkpt/webspace
-// @version      3.6
-// @description  彈出視窗追加向左/向右旋轉按鈕
+// @name         TIPO 專利內文現代化重構 (V3.7 內嵌懸浮拖拽版)
+// @namespace    http://tampermonkey.net/
+// @version      3.7
+// @description  將圖示視窗改為內嵌懸浮卡片，支援拖拽、縮放、旋轉與平移，且不被內文遮蔽
 // @author       Gemini
 // @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/*
-// @grant        GM_addStyle
 // @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI.js
 // @downloadURL  https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI.js
+// @grant        GM_addStyle
 // ==/UserScript==
 
 (function() {
@@ -16,9 +16,10 @@
     const checkIsDetail = () => document.querySelector('.TI') !== null;
     if (!checkIsDetail()) return;
 
+    let savedHeight = localStorage.getItem('tipo_gallery_height') || '220';
+
     const injectStyles = () => {
         if (document.getElementById('modern-style')) return;
-        const savedHeight = localStorage.getItem('tipo_gallery_height') || '220';
         GM_addStyle(`
             #modern-style {}
             body { background-color: #f4f7f9 !important; font-family: "PingFang TC", sans-serif !important; overflow: hidden !important; }
@@ -27,68 +28,91 @@
             #left-panel.collapsed { width: 45px; }
             #panel-toggle { background: #ea4c89; color: #fff; border: none; padding: 15px 5px; cursor: pointer; font-weight: bold; writing-mode: vertical-lr; text-orientation: upright; font-size: 14px; }
             #panel-content { padding: 15px; overflow-y: auto; flex: 1; }
-            #left-panel.collapsed #panel-content { visibility: hidden; width: 0; padding: 0; }
-
             #main-content-area { flex: 1; display: flex; flex-direction: column; padding: 0 15px; overflow: hidden; height: 100%; }
             #cards-container { display: grid; grid-template-columns: 60% calc(40% - 15px); gap: 15px; flex: 1; min-height: 0; margin-bottom: 10px; }
-            #right-column-stack { display: flex; flex-direction: column; gap: 10px; height: 100%; min-height: 0; }
             .patent-card { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; border: 1px solid #e0e0e0; overflow: hidden; }
             .card-header { background-color: #e3f2fd; color: #1976d2; padding: 10px 15px; font-weight: bold; border-bottom: 1px solid #d1d9e0; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; }
             .card-body { padding: 15px; overflow-y: auto; flex: 1; font-size: 15px; line-height: 1.8; }
-
             .action-panel { flex-shrink: 0; padding: 10px; background: #fff; border-radius: 12px; border: 1px solid #e0e0e0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
             .nav-icon { cursor: pointer; height: 30px; }
             .pill-btn-pink { background-color: #ea4c89; color: #fff; border: none; border-radius: 50px; padding: 4px 12px; font-size: 12px; cursor: pointer; font-weight: bold; }
 
+            /* 底部圖示區域 */
             #bottom-gallery-container { display: flex; gap: 10px; flex-shrink: 0; align-items: flex-end; padding-bottom: 5px; }
             #height-controls { display: flex; flex-direction: column; gap: 4px; width: 35px; }
             .h-btn { background: #ea4c89; color: #fff; border: none; border-radius: 6px; width: 32px; height: 32px; cursor: pointer; font-weight: bold; font-size: 18px; line-height: 1; }
-
             #bottom-gallery { flex: 1; height: ${savedHeight}px; background: #fff; padding: 8px; border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden; }
             .gallery-container { display: flex !important; flex-direction: row !important; overflow-x: auto !important; gap: 12px; height: 100%; align-items: center; white-space: nowrap; }
-            .gallery-container img { max-height: calc(100% - 8px) !important; width: auto !important; border-radius: 4px; cursor: zoom-in; }
+            .gallery-container img { max-height: calc(100% - 8px) !important; width: auto !important; border-radius: 4px; cursor: pointer; }
+
+            /* 懸浮分析卡片樣式 */
+            #floating-image-viewer {
+                position: fixed; top: 150px; left: 350px; width: 600px; height: 450px;
+                background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                z-index: 9999; display: none; flex-direction: column; border: 1px solid #ddd;
+            }
+            #viewer-header { background: #222; color: #fff; padding: 8px 15px; cursor: move; border-top-left-radius: 11px; border-top-right-radius: 11px; display: flex; justify-content: space-between; align-items: center; }
+            #viewer-main { flex: 1; display: flex; overflow: hidden; background: #333; }
+            #viewer-sidebar { width: 50px; background: #111; display: flex; flex-direction: column; align-items: center; padding: 15px 0; gap: 12px; z-index: 10; }
+            #viewer-content { flex: 1; position: relative; cursor: grab; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+            #viewer-content:active { cursor: grabbing; }
+            #viewer-img { transition: transform 0.1s; transform-origin: center; user-select: none; -webkit-user-drag: none; }
+            .v-btn { width: 32px; height: 32px; background: #ea4c89; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; }
 
             .rectable, .detGP_top, .panel-warning, .container > table:not(.T62), #footer { display: none !important; }
             .T62 { visibility: hidden; height: 0; overflow: hidden; position: absolute; }
         `);
     };
 
-    // V3.6 重點修正：彈窗增加旋轉邏輯
-    const openImageWindow = (imgSrc) => {
-        const popup = window.open('', '_blank', 'width=1100,height=850,toolbar=no,location=no,status=no,menubar=no,scrollbars=no');
-        if (!popup) return;
-        // 新增了 rot() 函數，更新了狀態變數 r (rotation)，並在 u() 函數中加入了 rotate() 變形
-        popup.document.write(`<html><head><title>圖示細節</title><style>body{margin:0;background:#222;display:flex;height:100vh;overflow:hidden;}
-        #sidebar{width:50px;background:#111;display:flex;flex-direction:column;align-items:center;padding-top:20px;gap:15px;border-right:1px solid #333; z-index: 100; position: relative;}
-        .btn{width:35px;height:35px;background:#ea4c89;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;font-size:18px;display:flex;align-items:center;justify-content:center;}
-        #view{flex:1;display:flex;align-items:center;justify-content:center;cursor:grab; z-index: 1;}
-        #view:active{cursor:grabbing;}
-        img{transition:0.2s;transform-origin:center;user-select:none;-webkit-user-drag:none;}</style></head><body>
-        <div id="sidebar">
-            <button class="btn" onclick="z(0.2)" title="放大">＋</button>
-            <button class="btn" onclick="z(-0.2)" title="縮小">－</button>
-            <button class="btn" onclick="rot(-90)" title="向左旋轉" style="font-size:20px;">↶</button>
-            <button class="btn" onclick="rot(90)" title="向右旋轉" style="font-size:20px;">↷</button>
-            <button class="btn" onclick="reset()" title="還原" style="font-size:12px">RE</button>
-        </div>
-        <div id="view"><img id="p" src="${imgSrc}"></div>
-        <script>
-            let s=1,r=0,x=0,y=0,d=false,sx,sy; const p=document.getElementById('p');
-            window.z=(v)=>{s=Math.min(Math.max(0.3,s+v),8);u();};
-            window.rot=(v)=>{r+=v;u();};
-            window.reset=()=>{s=1;r=0;x=0;y=0;u();};
-            function u(){p.style.transform=\`translate(\${x}px,\${y}px) rotate(\${r}deg) scale(\${s})\`;}
-            document.getElementById('view').onmousedown=(e)=>{d=true;sx=e.clientX-x;sy=e.clientY-y;e.preventDefault();};
-            window.onmousemove=(e)=>{if(!d)return;x=e.clientX-sx;y=e.clientY-sy;u();};
-            window.onmouseup=()=>d=false;
-            document.getElementById('view').onwheel=(e)=>{e.preventDefault();z(e.deltaY>0?-0.1:0.1);};
-        </script></body></html>`);
+    // 建立懸浮檢視器 DOM
+    const initFloatingViewer = () => {
+        if (document.getElementById('floating-image-viewer')) return;
+        const v = document.createElement('div');
+        v.id = 'floating-image-viewer';
+        v.innerHTML = `
+            <div id="viewer-header"><span>專利圖示分析</span><button id="close-viewer" style="background:none; border:none; color:#fff; cursor:pointer; font-size:18px;">×</button></div>
+            <div id="viewer-main">
+                <div id="viewer-sidebar">
+                    <button id="z-in" class="v-btn">＋</button>
+                    <button id="z-out" class="v-btn">－</button>
+                    <button id="r-l" class="v-btn">↶</button>
+                    <button id="r-r" class="v-btn">↷</button>
+                    <button id="v-reset" class="v-btn" style="font-size:10px">R</button>
+                </div>
+                <div id="viewer-content"><img id="viewer-img"></div>
+            </div>`;
+        document.body.appendChild(v);
+
+        let s=1, r=0, x=0, y=0, d=false, sx, sy, vx=0, vy=0, vd=false;
+        const img = document.getElementById('viewer-img');
+        const content = document.getElementById('viewer-content');
+        const header = document.getElementById('viewer-header');
+
+        const update = () => { img.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg) scale(${s})`; };
+        
+        // 圖片平移與縮放
+        content.onmousedown = (e) => { d=true; sx=e.clientX-x; sy=e.clientY-y; e.preventDefault(); };
+        window.addEventListener('mousemove', (e) => { if(!d) return; x=e.clientX-sx; y=e.clientY-sy; update(); });
+        window.addEventListener('mouseup', () => { d=false; vd=false; });
+        content.onwheel = (e) => { e.preventDefault(); s = Math.min(Math.max(0.3, s + (e.deltaY > 0 ? -0.1 : 0.1)), 8); update(); };
+
+        // 視窗拖拽
+        header.onmousedown = (e) => { vd=true; vx=e.clientX - v.offsetLeft; vy=e.clientY - v.offsetTop; };
+        window.addEventListener('mousemove', (e) => { if(!vd) return; v.style.left = (e.clientX - vx) + 'px'; v.style.top = (e.clientY - vy) + 'px'; });
+
+        document.getElementById('z-in').onclick = () => { s=Math.min(8, s+0.2); update(); };
+        document.getElementById('z-out').onclick = () => { s=Math.max(0.3, s-0.2); update(); };
+        document.getElementById('r-l').onclick = () => { r-=90; update(); };
+        document.getElementById('r-r').onclick = () => { r+=90; update(); };
+        document.getElementById('v-reset').onclick = () => { s=1; r=0; x=0; y=0; update(); };
+        document.getElementById('close-viewer').onclick = () => { v.style.display = 'none'; };
     };
 
     const reconstructUI = () => {
         if (!checkIsDetail() || document.getElementById('modern-wrapper')) return;
         injectStyles();
-        const savedHeight = localStorage.getItem('tipo_gallery_height') || '220';
+        initFloatingViewer();
+
         const panels = document.querySelectorAll('.panel-body');
         const bibData = panels[1]?.innerHTML || "";
         const claimsContent = (panels[2]?.innerHTML || "").trim();
@@ -124,8 +148,20 @@
         document.body.appendChild(wrapper);
         document.getElementById('n-box').appendChild(actionPanel);
 
-        if (imgBox) { imgBox.querySelectorAll('img').forEach(img => { const nImg = img.cloneNode(); nImg.onclick = () => openImageWindow(img.src); document.getElementById('g-box').appendChild(nImg); }); }
-
+        if (imgBox) {
+            const galleryBox = document.getElementById('g-box');
+            imgBox.querySelectorAll('img').forEach(img => {
+                const nImg = img.cloneNode();
+                nImg.onclick = () => {
+                    const fv = document.getElementById('floating-image-viewer');
+                    const fi = document.getElementById('viewer-img');
+                    fi.src = img.src;
+                    fv.style.display = 'flex';
+                };
+                galleryBox.appendChild(nImg);
+            });
+        }
+        
         const gallery = document.getElementById('bottom-gallery');
         document.getElementById('h-p').onclick = () => { let h = Math.min(600, parseInt(gallery.style.height) + 50); gallery.style.height = h + 'px'; localStorage.setItem('tipo_gallery_height', h); };
         document.getElementById('h-m').onclick = () => { let h = Math.max(100, parseInt(gallery.style.height) - 50); gallery.style.height = h + 'px'; localStorage.setItem('tipo_gallery_height', h); };

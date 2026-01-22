@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         TIPO 專利內文現代化重構 (V3.5 彈窗圖層修正版)
+// @name         TIPO 專利內文現代化重構 (V3.6 彈窗旋轉功能版)
 // @namespace    http://tampermonkey.net/
-// @version      3.5
-// @description  修正彈出視窗縮放時圖示遮擋按鈕的問題 (Z-Index 修復)
+// @version      3.6
+// @description  彈出視窗追加向左/向右旋轉按鈕
 // @author       Gemini
-// @match        https://tiponet.tipo.gov.tw/gpss2/gpsskmc/*
+// @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/*
 // @grant        GM_addStyle
 // ==/UserScript==
 
@@ -51,17 +51,36 @@
         `);
     };
 
-    // V3.5 重點修正：彈出視窗 CSS 加入 z-index 管理
+    // V3.6 重點修正：彈窗增加旋轉邏輯
     const openImageWindow = (imgSrc) => {
         const popup = window.open('', '_blank', 'width=1100,height=850,toolbar=no,location=no,status=no,menubar=no,scrollbars=no');
         if (!popup) return;
+        // 新增了 rot() 函數，更新了狀態變數 r (rotation)，並在 u() 函數中加入了 rotate() 變形
         popup.document.write(`<html><head><title>圖示細節</title><style>body{margin:0;background:#222;display:flex;height:100vh;overflow:hidden;}
-        /* 修正處：加入 z-index: 100 與 position: relative 確保側邊欄在最上層 */
         #sidebar{width:50px;background:#111;display:flex;flex-direction:column;align-items:center;padding-top:20px;gap:15px;border-right:1px solid #333; z-index: 100; position: relative;}
-        .btn{width:35px;height:35px;background:#ea4c89;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;font-size:18px;}
+        .btn{width:35px;height:35px;background:#ea4c89;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;font-size:18px;display:flex;align-items:center;justify-content:center;}
         #view{flex:1;display:flex;align-items:center;justify-content:center;cursor:grab; z-index: 1;}
         #view:active{cursor:grabbing;}
-        img{transition:0.1s;transform-origin:center;user-select:none;-webkit-user-drag:none;}</style></head><body><div id="sidebar"><button class="btn" onclick="z(0.2)">＋</button><button class="btn" onclick="z(-0.2)">－</button><button class="btn" onclick="r()" style="font-size:10px">R</button></div><div id="view"><img id="p" src="${imgSrc}"></div><script>let s=1,x=0,y=0,d=false,sx,sy;const p=document.getElementById('p');window.z=(v)=>{s=Math.min(Math.max(0.3,s+v),8);u();};window.r=()=>{s=1;x=0;y=0;u();};function u(){p.style.transform=\`translate(\${x}px,\${y}px) scale(\${s})\`;}document.getElementById('view').onmousedown=(e)=>{d=true;sx=e.clientX-x;sy=e.clientY-y;e.preventDefault();};window.onmousemove=(e)=>{if(!d)return;x=e.clientX-sx;y=e.clientY-sy;u();};window.onmouseup=()=>d=false;</script></body></html>`);
+        img{transition:0.2s;transform-origin:center;user-select:none;-webkit-user-drag:none;}</style></head><body>
+        <div id="sidebar">
+            <button class="btn" onclick="z(0.2)" title="放大">＋</button>
+            <button class="btn" onclick="z(-0.2)" title="縮小">－</button>
+            <button class="btn" onclick="rot(-90)" title="向左旋轉" style="font-size:20px;">↶</button>
+            <button class="btn" onclick="rot(90)" title="向右旋轉" style="font-size:20px;">↷</button>
+            <button class="btn" onclick="reset()" title="還原" style="font-size:12px">RE</button>
+        </div>
+        <div id="view"><img id="p" src="${imgSrc}"></div>
+        <script>
+            let s=1,r=0,x=0,y=0,d=false,sx,sy; const p=document.getElementById('p');
+            window.z=(v)=>{s=Math.min(Math.max(0.3,s+v),8);u();};
+            window.rot=(v)=>{r+=v;u();};
+            window.reset=()=>{s=1;r=0;x=0;y=0;u();};
+            function u(){p.style.transform=\`translate(\${x}px,\${y}px) rotate(\${r}deg) scale(\${s})\`;}
+            document.getElementById('view').onmousedown=(e)=>{d=true;sx=e.clientX-x;sy=e.clientY-y;e.preventDefault();};
+            window.onmousemove=(e)=>{if(!d)return;x=e.clientX-sx;y=e.clientY-sy;u();};
+            window.onmouseup=()=>d=false;
+            document.getElementById('view').onwheel=(e)=>{e.preventDefault();z(e.deltaY>0?-0.1:0.1);};
+        </script></body></html>`);
     };
 
     const reconstructUI = () => {

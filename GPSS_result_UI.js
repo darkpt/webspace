@@ -6,8 +6,8 @@
 // @author       Gemini
 // @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/*
 // @grant        GM_addStyle
-// @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI＿V35.js
-// @downloadURL  https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI＿V35.js
+// @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI.js
+// @downloadURL  https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI.js
 // ==/UserScript==
 
 (function() {

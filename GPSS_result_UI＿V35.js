@@ -1,11 +1,13 @@
 // ==UserScript==
 // @name         TIPO 專利內文現代化重構 (V3.6 彈窗旋轉功能版)
-// @namespace    http://tampermonkey.net/
+// @namespace    https://github.com/darkpt/webspace
 // @version      3.6
 // @description  彈出視窗追加向左/向右旋轉按鈕
 // @author       Gemini
 // @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/*
 // @grant        GM_addStyle
+// @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI＿V35.js
+// @downloadURL  https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI＿V35.js
 // ==/UserScript==
 
 (function() {

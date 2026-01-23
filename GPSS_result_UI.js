@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         TIPO 專利內文現代化重構 (V4.3 收藏功能版)
+// @name         TIPO 專利內文現代化重構 (V4.4 台灣PDF下載問題修正)
 // @namespace    http://tampermonkey.net/
-// @version      4.3.1
-// @description  新增專利收藏功能：本地儲存、側邊面板檢視、匯出
+// @version      4.4
+// @description  修正台灣專利PDF下載
 // @author       Gemini & Claude
 // @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/*
 // @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI.js
@@ -86,166 +86,290 @@
         }
     };
 
-// ========== 頁面資訊提取 ==========
-const extractCurrentPatent = () => {
-    // 專利名稱
-    const titleEl = document.querySelector('.TI');
-    const title = titleEl ? titleEl.textContent.trim().split('\n')[0].trim() : '';
+    // ========== 頁面資訊提取 ==========
+    const extractCurrentPatent = () => {
+        // 專利名稱
+        const titleEl = document.querySelector('.TI');
+        const title = titleEl ? titleEl.textContent.trim().split('\n')[0].trim() : '';
 
-    // 用 regex 抓「看起來像專利/公開號」的第一個 token
-    const pickPatentNo = (text) => {
-        if (!text) return '';
-        const normalized = String(text).replace(/\s+/g, ' ').trim();
-        // 常見格式：TWI901952B、TW202334885A、USxxxx、CNxxxx 等
-        const m = normalized.match(/\b[A-Z]{2,}\d+[A-Z0-9]*\b/);
-        return m ? m[0].trim() : '';
+        // 用 regex 抓「看起來像專利/公開號」的第一個 token
+        const pickPatentNo = (text) => {
+            if (!text) return '';
+            const normalized = String(text).replace(/\s+/g, ' ').trim();
+            // 常見格式：TWI901952B、TW202334885A、USxxxx、CNxxxx 等
+            const m = normalized.match(/\b[A-Z]{2,}\d+[A-Z0-9]*\b/);
+            return m ? m[0].trim() : '';
+        };
+
+        // 公告號/公開號（多標籤 + 文字抽取，不依賴 childNodes[0]）
+        let number = '';
+        const wantedLabels = new Set(['公告號', '公開號', '公開公告號', '公開編號']);
+        document.querySelectorAll('tr.rectr').forEach(row => {
+            const label = row.querySelector('td.dettb01')?.textContent?.trim() || '';
+            const valueText = row.querySelector('td.dettb02')?.textContent || '';
+            if (!number && wantedLabels.has(label)) {
+                number = pickPatentNo(valueText);
+            }
+        });
+
+        // fallback 1：#gps_title（範例頁會是 "TWI901952B-..."）
+        if (!number) {
+            const gpsTitle = document.querySelector('#gps_title')?.textContent || '';
+            number = pickPatentNo(gpsTitle);
+        }
+
+        // 申請人
+        let applicant = '';
+        document.querySelectorAll('tr.rectr').forEach(row => {
+            const label = row.querySelector('td.dettb01');
+            const value = row.querySelector('td.dettb02');
+            if (label?.textContent.trim() === '申請人') {
+                const firstLink = value?.querySelector('a');
+                applicant = firstLink
+                    ? firstLink.textContent.trim()
+                : (value?.textContent.trim().split(';')[0].trim() || '');
+            }
+        });
+
+        // 連結 (從 #FRURL 取得)
+        const urlInput = document.getElementById('FRURL');
+        const url = urlInput ? urlInput.value : window.location.href;
+
+        // fallback 2：從 FRURL 字串中抽號（例如 ...?!!FRURLTWI901952B）
+        if (!number) {
+            const m = String(url || '').match(/!!FRURL([A-Z0-9]+)/i);
+            if (m) number = m[1].trim();
+        }
+
+        return { number, title, applicant, url };
     };
 
-    // 公告號/公開號（多標籤 + 文字抽取，不依賴 childNodes[0]）
-    let number = '';
-    const wantedLabels = new Set(['公告號', '公開號', '公開公告號', '公開編號']);
-    document.querySelectorAll('tr.rectr').forEach(row => {
-        const label = row.querySelector('td.dettb01')?.textContent?.trim() || '';
-        const valueText = row.querySelector('td.dettb02')?.textContent || '';
-        if (!number && wantedLabels.has(label)) {
-            number = pickPatentNo(valueText);
-        }
-    });
-
-    // fallback 1：#gps_title（範例頁會是 "TWI901952B-..."）
-    if (!number) {
-        const gpsTitle = document.querySelector('#gps_title')?.textContent || '';
-        number = pickPatentNo(gpsTitle);
-    }
-
-    // 申請人
-    let applicant = '';
-    document.querySelectorAll('tr.rectr').forEach(row => {
-        const label = row.querySelector('td.dettb01');
-        const value = row.querySelector('td.dettb02');
-        if (label?.textContent.trim() === '申請人') {
-            const firstLink = value?.querySelector('a');
-            applicant = firstLink
-                ? firstLink.textContent.trim()
-                : (value?.textContent.trim().split(';')[0].trim() || '');
-        }
-    });
-
-    // 連結 (從 #FRURL 取得)
-    const urlInput = document.getElementById('FRURL');
-    const url = urlInput ? urlInput.value : window.location.href;
-
-    // fallback 2：從 FRURL 字串中抽號（例如 ...?!!FRURLTWI901952B）
-    if (!number) {
-        const m = String(url || '').match(/!!FRURL([A-Z0-9]+)/i);
-        if (m) number = m[1].trim();
-    }
-
-    return { number, title, applicant, url };
-};
-
-
-    // ========== 全文下載模組 ==========
+    // ========== 全文下載器 ==========
     const FullTextDownloader = {
+        // 從圖示表格/連結抓到 gpssNum 與 usrCode（比掃 innerHTML 更穩）
+        // 使用者提供：class="img_sz" -> href="/gpss\\d/gpssbkmusr/\\d{5}/專利號.png"
         extractPathParams: () => {
-            const html = document.body.innerHTML;
-            const match = html.match(/\/gpss(\d)\/gpssbkmusr\/(\d{5})\//);
-            return match ? { gpssNum: match[1], usrCode: match[2] } : null;
+            // 取得目前頁面的專利號（用於挑選正確的 png href）
+            const nums = FullTextDownloader.extractPatentNumbers();
+            const raw = nums?.grantNumber || nums?.publicationNumber || '';
+
+            // 取得核心碼：TWM536362U -> 536362；TWI649590B -> 649590；TW201805691A -> 201805691
+            const core = (() => {
+                const s = String(raw).trim();
+                let m = s.match(/^TWI(\d+)B$/i);
+                if (m) return m[1];
+                m = s.match(/^TWM(\d+)U$/i);
+                if (m) return m[1];
+                m = s.match(/^TW(\d+)A$/i);
+                if (m) return m[1];
+                // fallback：抓一段長數字
+                m = s.match(/(\d{6,})/);
+                return m ? m[1] : '';
+            })();
+
+            // 收集所有可能的 png href（class 可能在 img，不在 a）
+            const candidates = Array.from(document.querySelectorAll('a[href*="/gpssbkmusr/"][href$=".png"]'))
+            .map(a => a.getAttribute('href'))
+            .filter(Boolean);
+
+            // 從候選 href 解析出 gpssNum / usrCode
+            const parse = (href) => {
+                const m = String(href).match(/\/gpss(\d)\/gpssbkmusr\/(\d{5})\//i);
+                return m ? { gpssNum: m[1], usrCode: m[2], href } : null;
+            };
+
+            const parsed = candidates.map(parse).filter(Boolean);
+
+            // 1) 優先選「href 內含 core」者（例如 .../00382/M536362.png）
+            if (core) {
+                const hit = parsed.find(x => x.href.includes(core));
+                if (hit) return { gpssNum: hit.gpssNum, usrCode: hit.usrCode };
+            }
+
+            // 2) 次佳：若有多個，盡量選 gpss2（TIPO 常見新站）
+            const gpss2 = parsed.find(x => x.gpssNum === '2');
+            if (gpss2) return { gpssNum: gpss2.gpssNum, usrCode: gpss2.usrCode };
+
+            // 3) 最後：選第一個可解析者
+            if (parsed.length) return { gpssNum: parsed[0].gpssNum, usrCode: parsed[0].usrCode };
+
+            // 4) 再 fallback：從整頁 HTML 找一次
+            const html = document.body?.innerHTML || '';
+            const m = html.match(/\/gpss(\d)\/gpssbkmusr\/(\d{5})\//i);
+            return m ? { gpssNum: m[1], usrCode: m[2] } : null;
         },
 
+
+        // 命名規則（你提供）
+        // 台灣：發明 公開 TWAN-；發明 公告 TWBN-I；新型 公告 TWBN-M
         rules: {
             TW: {
-                inventionGrant: (certNum) => `TWBN-${certNum}`,
-                utilityGrant: (certNum) => `TWBN-${certNum}`,
-                inventionPublication: (pubNum) => `TWAN-${pubNum}`,
+                inventionGrant: (certNum) => {
+                    const n = String(certNum || '').trim().replace(/^I/i, '');
+                    return `TWBN-I${n}`;
+                },
+                utilityGrant: (certNum) => {
+                    const n = String(certNum || '').trim().replace(/^M/i, '');
+                    return `TWBN-M${n}`;
+                },
+                inventionPublication: (pubNum) => {
+                    const n = String(pubNum || '').trim();
+                    return `TWAN-${n}`;
+                },
+
                 parse: (rawNumber) => {
                     if (!rawNumber) return null;
-                    const num = rawNumber.trim();
-                    if (/^TWI\d+B$/.test(num)) return { type: 'inventionGrant', number: num.slice(2, -1) };
-                    if (/^TWM\d+U$/.test(num)) return { type: 'utilityGrant', number: num.slice(2, -1) };
-                    if (/^TW\d+A$/.test(num)) return { type: 'inventionPublication', number: num.slice(2, -1) };
+                    const num = String(rawNumber).trim();
+
+                    // 1) 標準格式：TWI901952B / TWM536362U / TW201805691A
+                    let m = num.match(/^TWI(\d+)B$/i);
+                    if (m) return { type: 'inventionGrant', number: m[1] };
+
+                    m = num.match(/^TWM(\d+)U$/i);
+                    if (m) return { type: 'utilityGrant', number: m[1] };
+
+                    m = num.match(/^TW(\d+)A$/i);
+                    if (m) return { type: 'inventionPublication', number: m[1] };
+
+                    // 2) 非標準：M536362 / I649590
+                    m = num.match(/^M(\d+)$/i);
+                    if (m) return { type: 'utilityGrant', number: m[1] };
+
+                    m = num.match(/^I(\d+)$/i);
+                    if (m) return { type: 'inventionGrant', number: m[1] };
+
+                    // 3) 只有數字：先猜公開（避免亂猜公告 I/M）
+                    m = num.match(/^(\d{6,})$/);
+                    if (m) return { type: 'inventionPublication', number: m[1] };
+
                     return null;
-                }
+                },
+
             },
         },
 
-extractPatentNumbers: () => {
-    const result = { grantNumber: null, publicationNumber: null };
+        // 從書目資料表格抓 公告號/公開號（不依賴 childNodes）
+        extractPatentNumbers: () => {
+            const result = { grantNumber: null, publicationNumber: null };
 
-    const pickPatentNo = (text) => {
-        if (!text) return '';
-        const normalized = String(text).replace(/\s+/g, ' ').trim();
-        const m = normalized.match(/\b[A-Z]{2,}\d+[A-Z0-9]*\b/);
-        return m ? m[0].trim() : '';
-    };
+            const pickPatentNo = (text) => {
+                if (!text) return '';
+                const normalized = String(text).replace(/\s+/g, ' ').trim();
+                // 盡量抓像 TWI901952B / TWM536362U / TW201805691A 的 token
+                const m = normalized.match(/\b(?:TWI\d+B|TWM\d+U|TW\d+A)\b/i);
+                return m ? m[0].trim() : '';
+            };
 
-    document.querySelectorAll('tr.rectr').forEach(row => {
-        const label = row.querySelector('td.dettb01')?.textContent?.trim() || '';
-        const valueCell = row.querySelector('td.dettb02');
+            document.querySelectorAll('tr.rectr').forEach(row => {
+                const label = row.querySelector('td.dettb01')?.textContent?.trim() || '';
+                const valueCell = row.querySelector('td.dettb02');
+                const cellText = valueCell?.textContent || '';
 
-        // 公告號（授權號）
-        if (!result.grantNumber && label === '公告號') {
-            const cellText = valueCell?.textContent || '';
-            result.grantNumber = pickPatentNo(cellText) || null;
+                if (label === '公告號' && !result.grantNumber) {
+                    result.grantNumber = pickPatentNo(cellText) || null;
 
-            // 同一格內的 span.linkan a 通常是「公開」連結
-            const pubLink = valueCell?.querySelector('span.linkan a');
-            if (pubLink) result.publicationNumber = pubLink.textContent.trim();
-        }
+                    // 同一格內可能有公開號的連結
+                    const pubLink = valueCell?.querySelector('span.linkan a');
+                    if (pubLink && !result.publicationNumber) {
+                        result.publicationNumber = pubLink.textContent.trim();
+                    }
+                }
 
-        // 若頁面沒有公告號，可能只有公開號
-        if (!result.publicationNumber && (label === '公開號' || label === '公開公告號' || label === '公開編號')) {
-            const cellText = valueCell?.textContent || '';
-            result.publicationNumber = pickPatentNo(cellText) || null;
-        }
-    });
+                if ((label === '公開號' || label === '公開公告號' || label === '公開編號') && !result.publicationNumber) {
+                    result.publicationNumber = pickPatentNo(cellText) || null;
+                }
+            });
 
-    // fallback：#gps_title
-    if (!result.grantNumber && !result.publicationNumber) {
-        const gpsTitle = document.querySelector('#gps_title')?.textContent || '';
-        const n = pickPatentNo(gpsTitle);
-        if (n) result.grantNumber = n; // 先放 grantNumber，後續流程可照舊走
-    }
+            // fallback：#gps_title（通常像 "TWI901952B-..."）
+            if (!result.grantNumber && !result.publicationNumber) {
+                const gpsTitle = document.querySelector('#gps_title')?.textContent || '';
+                const n = pickPatentNo(gpsTitle);
+                if (n) {
+                    // 先放 grantNumber，讓既有下游流程（grant優先）可照舊
+                    result.grantNumber = n;
+                }
+            }
 
-    // fallback：FRURL
-    if (!result.grantNumber && !result.publicationNumber) {
-        const urlInput = document.getElementById('FRURL');
-        const url = urlInput ? urlInput.value : window.location.href;
-        const m = String(url || '').match(/!!FRURL([A-Z0-9]+)/i);
-        if (m) result.grantNumber = m[1].trim();
-    }
-
-    return result;
-},
+            return result;
+        },
 
         generateDownloadURL: (country = 'TW') => {
             const pathParams = FullTextDownloader.extractPathParams();
             if (!pathParams) return null;
+
             const patentNums = FullTextDownloader.extractPatentNumbers();
             const rules = FullTextDownloader.rules[country];
             if (!rules) return null;
+
+            // 下載優先順序：公告(授權) > 公開
             const targetNumber = patentNums.grantNumber || patentNums.publicationNumber;
             const parsed = rules.parse(targetNumber);
             if (!parsed) return null;
+
             const filename = rules[parsed.type](parsed.number);
             return {
                 url: `https://tiponet.tipo.gov.tw/gpss${pathParams.gpssNum}/gpssbkmusr/${pathParams.usrCode}/pdf/${filename}.pdf`,
                 filename: `${filename}.pdf`
-            };
+        };
         },
 
-        download: (country = 'TW') => {
+        // 改成 fetch + 檢查 %PDF，避免把 HTML/404 存成毀損 PDF
+        download: async (country = 'TW') => {
             const result = FullTextDownloader.generateDownloadURL(country);
+            console.log('[TIPO PDF URL]', result.url);
+
             if (!result) { alert('無法產生下載連結'); return; }
-            const a = document.createElement('a');
-            a.href = result.url;
-            a.download = result.filename;
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => document.body.removeChild(a), 100);
+
+            try {
+                const resp = await fetch(result.url, {
+                    method: 'GET',
+                    credentials: 'include',
+                    cache: 'no-store',
+                });
+
+                if (!resp.ok) {
+                    alert(`下載失敗：HTTP ${resp.status}\n將開啟原連結供確認。`);
+                    window.open(result.url, '_blank', 'noopener');
+                    return;
+                }
+
+                const buf = await resp.arrayBuffer();
+                if (buf.byteLength < 5) {
+                    alert('下載內容異常（內容過短），將開啟原連結供確認。');
+                    window.open(result.url, '_blank', 'noopener');
+                    return;
+                }
+
+                // 檢查檔頭是否為 %PDF
+                const head = new TextDecoder('ascii').decode(buf.slice(0, 4));
+                if (head !== '%PDF') {
+                    alert('下載到的內容不是 PDF（可能是導頁/錯誤頁/權限頁），將開啟原連結供確認。');
+                    window.open(result.url, '_blank', 'noopener');
+                    return;
+                }
+
+                const blob = new Blob([buf], { type: 'application/pdf' });
+                const objectUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = objectUrl;
+                a.download = result.filename;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+
+                setTimeout(() => {
+                    URL.revokeObjectURL(objectUrl);
+                    document.body.removeChild(a);
+                }, 500);
+
+            } catch (e) {
+                alert(`下載例外：${e?.message || e}\n將開啟原連結供確認。`);
+                window.open(result.url, '_blank', 'noopener');
+            }
         }
     };
+
 
     // ========== 頁面資訊提取（頂部顯示用） ==========
     const extractPageInfo = () => {

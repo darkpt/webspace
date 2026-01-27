@@ -1,11 +1,12 @@
 // ==UserScript==
-// @name         Prompt Template Panel (Safe DOM + SPA + Import/Export)
+// @name         Prompt Template Panel 
 // @namespace    https://example.local/
-// @version      0.4.2
-// @description  Collapsible right panel: templates, save, import/export, copy Markdown. Safe DOM build + SPA resilient.
+// @version      0.4.3
+// @description  增加Notebokllm的顯示
 // @match        https://chatgpt.com/*
 // @match        https://gemini.google.com/*
 // @match        https://claude.ai/chat/*
+// @match        https://notebooklm.google.com/*
 // @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/Prompt_Template_Panel.js
 // @downloadURL  https://raw.githubusercontent.com/darkpt/webspace/main/Prompt_Template_Panel.js
 // @run-at       document-end

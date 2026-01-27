@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Prompt Template Panel (Safe DOM + SPA + Import/Export)
 // @namespace    https://example.local/
-// @version      0.4.1
+// @version      0.4.2
 // @description  Collapsible right panel: templates, save, import/export, copy Markdown. Safe DOM build + SPA resilient.
-// @match        https://chatgpt.com/c/*
-// @match        https://gemini.google.com/app/*
+// @match        https://chatgpt.com/*
+// @match        https://gemini.google.com/*
 // @match        https://claude.ai/chat/*
 // @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/Prompt_Template_Panel.js
 // @downloadURL  https://raw.githubusercontent.com/darkpt/webspace/main/Prompt_Template_Panel.js

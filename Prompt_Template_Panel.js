@@ -6,6 +6,8 @@
 // @match        https://chatgpt.com/c/*
 // @match        https://gemini.google.com/app/*
 // @match        https://claude.ai/chat/*
+// @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/Prompt_Template_Panel.js
+// @downloadURL  https://raw.githubusercontent.com/darkpt/webspace/main/Prompt_Template_Panel.js
 // @run-at       document-end
 // @noframes
 // @grant        GM_getValue

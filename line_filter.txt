@@ -1,0 +1,33 @@
+! Line
+! 白名單
+@@||obs.line-scdn.net/r
+@@||obs-tw.line-apps.com/talk
+@@||stickershop.line-scdn.net
+! UA 偽裝
+||a.line.me/er/la*/v1/$image,empty
+||w.line.me/la*/api/v*/ads^$empty
+! 廣告媒體
+||d.line-scdn.net/lcp-prod-photo/$image,empty
+||obs.line-scdn.net/0h*/w750$empty
+||obs.line-scdn.net/0h*/o1280x720$empty
+! 廣告資料
+||sch.line.me/api/v*/ads^$empty
+||buy.line.me/api/graphql?variables$empty
+! Line 新聞
+||crs-event.line.me^$empty
+||api.today.line.me/webapi/TW/recommendation/articles/articleend^$empty
+
+! 額外 LINE 規則
+||linecrs.line-scdn.net^$important
+||voom-assets.line-scdn.net^$important
+||today-obs.line-scdn.net^$important
+||voom-obs.line-scdn.net^$important
+||today.line.me^$important
+||jp-col-tcp.nelo.linecorp.com^$important
+||uts-front.line-apps.com^$important
+||ad.line-scdn.net^$important
+||a.line.me^$important
+! (option) ||legy.line-apps.com^$important
+! (option) ||legy.line-apps.com.akadns.net^$important
+! (option) ||legy-jp-addr-ds.line-apps.com^$important
+! (option) ||obs.line-scdn.net^$important

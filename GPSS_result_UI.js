@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         TIPO 專利內文現代化重構 (V5.0)
+// @name         專利內文重構 (V5.10)
 // @namespace    http://tampermonkey.net/
-// @version      5.0
-// @description  增加MEMO快速筆記，修正整體架構
-// @author       Claude
+// @version      5.1
+// @description  修正台灣下載PDF
+// @author       Darkpt
 // @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/*
 // @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI.js
 // @downloadURL  https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI.js
@@ -51,7 +51,8 @@
             IMAGE_BOX: '#g2, .detGP',
             DETAIL_ROW: 'tr.rectr',
             GPS_TITLE: '#gps_title',
-            FR_URL: '#FRURL'
+            FR_URL: '#FRURL',
+            IMAGE_LINK: 'a[href*="/gpsskmusr/"][href$=".png"]'
         },
 
         // 訊息
@@ -69,7 +70,9 @@
             COPY_FAILED: '複製失敗',
             NO_MEMO_TO_EXPORT: '無MEMO可匯出',
             EXPORT_SUCCESS: '已匯出',
-            DOWNLOAD_BLOCKED: '下載失敗,請檢查瀏覽器設定是否阻擋下載'
+            DOWNLOAD_BLOCKED: '下載失敗,請檢查瀏覽器設定是否阻擋下載',
+            COUNTRY_NOT_SUPPORTED: '此國別暫不支援全文下載',
+            NO_APPLICATION_NUMBER: '無法取得申請號'
         },
 
         // 檔案類型
@@ -362,7 +365,7 @@
                 }
 
                 const exists = all[patent.number].annotations
-                    .some(a => a.text === trimmedText);
+                .some(a => a.text === trimmedText);
 
                 if (exists) {
                     return {
@@ -538,8 +541,10 @@
             const number = this.extractPatentNumber();
             const applicant = this.extractApplicant();
             const url = this.extractURL();
+            const applicationNumber = this.extractApplicationNumber();
+            const country = this.detectCountry(applicationNumber);
 
-            return { number, title, applicant, url };
+            return { number, title, applicant, url, applicationNumber, country };
         },
 
         /**
@@ -598,13 +603,41 @@
                     const firstLink = value?.querySelector('a');
                     applicant = firstLink
                         ? firstLink.textContent.trim()
-                        : (value?.textContent.trim().split(';')[0].trim() || '');
+                    : (value?.textContent.trim().split(';')[0].trim() || '');
                 }
             });
 
             return applicant;
         },
+        /**
+ * 提取申請號
+ * @returns {string} 申請號
+ */
+        extractApplicationNumber() {
+            let applicationNumber = '';
 
+            document.querySelectorAll(CONSTANTS.SELECTORS.DETAIL_ROW).forEach(row => {
+                const label = row.querySelector('td.dettb01')?.textContent?.trim() || '';
+                const valueText = row.querySelector('td.dettb02')?.textContent || '';
+
+                if (!applicationNumber && label === '申請號') {
+                    applicationNumber = valueText.replace(/\s+/g, ' ').trim();
+                }
+            });
+
+            return applicationNumber;
+        },
+
+        /**
+ * 從申請號前兩字母偵測國別代碼
+ * @param {string} applicationNumber - 申請號
+ * @returns {string} 國別代碼（如 'TW'、'US'），無法判定時回傳空字串
+ */
+        detectCountry(applicationNumber) {
+            if (!applicationNumber || applicationNumber.length < 2) return '';
+            const prefix = applicationNumber.substring(0, 2).toUpperCase();
+            return prefix;
+        },
         /**
          * 提取專利連結
          * @returns {string} 專利連結
@@ -690,10 +723,10 @@
          */
         findImageURLs() {
             return Array.from(
-                document.querySelectorAll('a[href*="/gpssbkmusr/"][href$=".png"]')
+                document.querySelectorAll(CONSTANTS.SELECTORS.IMAGE_LINK)
             )
-            .map(a => a.getAttribute('href'))
-            .filter(Boolean);
+                .map(a => a.getAttribute('href'))
+                .filter(Boolean);
         },
 
         /**
@@ -702,7 +735,7 @@
          * @returns {Object|null} 解析結果
          */
         parseImageURL(href) {
-            const match = String(href).match(/\/gpss(\d)\/gpssbkmusr\/(\d{5})\//i);
+            const match = String(href).match(/\/gpss(\d)\/gpsskmusr\/(\d{5})\//i);
             return match ? {
                 gpssNum: match[1],
                 usrCode: match[2],
@@ -716,7 +749,7 @@
          */
         fallbackExtractFromHTML() {
             const html = document.body?.innerHTML || '';
-            const match = html.match(/\/gpss(\d)\/gpssbkmusr\/(\d{5})\//i);
+            const match = html.match(/\/gpss(\d)\/gpsskmusr\/(\d{5})\//i);
             return match ? { gpssNum: match[1], usrCode: match[2] } : null;
         },
 
@@ -819,17 +852,35 @@
 
             const filename = rules[parsed.type](parsed.number);
             return {
-                url: `https://tiponet.tipo.gov.tw/gpss${pathParams.gpssNum}/gpssbkmusr/${pathParams.usrCode}/pdf/${filename}.pdf`,
+                url: `https://tiponet.tipo.gov.tw/gpss${pathParams.gpssNum}/gpsskmusr/${pathParams.usrCode}/pdf/${filename}.pdf`,
                 filename: `${filename}.pdf`
             };
         },
 
         /**
-         * 下載全文 PDF
-         * @param {string} country - 國家代碼
-         */
-        async download(country = 'TW') {
+ * 下載全文 PDF（自動偵測國別）
+ */
+        async download() {
+            const patent = PageExtractor.extractCurrentPatent();
+            const country = patent.country;
+
+            if (!country) {
+                Utils.showToast(CONSTANTS.MESSAGES.NO_APPLICATION_NUMBER);
+                return;
+            }
+
+            if (country !== 'TW') {
+                Utils.showToast(CONSTANTS.MESSAGES.COUNTRY_NOT_SUPPORTED);
+                return;
+            }
+
             const result = this.generateDownloadURL(country);
+            console.log('[FullTextDownloader]', {
+                applicationNumber: patent.applicationNumber,
+                detectedCountry: country,
+                generatedURL: result?.url || null,
+                filename: result?.filename || null
+            });
 
             if (!result) {
                 alert('無法產生下載連結');
@@ -947,7 +998,7 @@
             if (document.getElementById('modern-style')) return;
 
             const savedHeight = localStorage.getItem(CONSTANTS.STORAGE_KEYS.GALLERY_HEIGHT) ||
-                               CONSTANTS.DEFAULT_GALLERY_HEIGHT;
+                  CONSTANTS.DEFAULT_GALLERY_HEIGHT;
 
             const styles = `
                 #modern-style {}
@@ -2065,7 +2116,7 @@
          */
         createAnnotationItemHTML(annotation, index) {
             const timeStr = annotation.addedAt ?
-                annotation.addedAt.slice(0, 16).replace('T', ' ') : '';
+                  annotation.addedAt.slice(0, 16).replace('T', ' ') : '';
 
             return `
                 <div class="memo-annotation-item" data-index="${index}">
@@ -2278,7 +2329,7 @@
          */
         show(x, y) {
             const menu = document.getElementById('custom-context-menu') ||
-                        UIComponents.createContextMenu();
+                  UIComponents.createContextMenu();
 
             if (this.textCaptureCallback) {
                 this.textCaptureCallback();
@@ -2324,9 +2375,9 @@
                 const target = e.target;
 
                 const isInContentArea = target.closest('#d-body') ||
-                                       target.closest('.card-body') ||
-                                       target.closest('#panel-content') ||
-                                       target.closest('#modern-wrapper');
+                      target.closest('.card-body') ||
+                      target.closest('#panel-content') ||
+                      target.closest('#modern-wrapper');
 
                 if (selectedText && selectedText.length > 0 && isInContentArea) {
                     e.preventDefault();
@@ -2628,7 +2679,7 @@
             return btn;
         },
 
-/**
+        /**
          * 建立標題區域
          * @param {Object} pageInfo - 頁面資訊
          * @returns {HTMLElement} 標題區域元素
@@ -2712,7 +2763,7 @@
                 if (favPanel) favPanel.classList.remove('open');
 
                 const panel = document.getElementById('memo-panel') ||
-                             UIComponents.createMemoPanel();
+                      UIComponents.createMemoPanel();
                 UIComponents.renderMemoList();
                 panel.classList.toggle('open');
             };
@@ -2746,14 +2797,14 @@
         },
 
         /**
-         * 建立下載按鈕
-         * @returns {HTMLElement} 下載按鈕
-         */
+ * 建立下載按鈕
+ * @returns {HTMLElement} 下載按鈕
+ */
         createDownloadButton() {
             const btn = document.createElement('button');
             btn.className = 'header-download-btn';
             btn.innerHTML = '📄 下載全文';
-            btn.onclick = () => FullTextDownloader.download('TW');
+            btn.onclick = () => FullTextDownloader.download();
 
             return btn;
         },
@@ -2773,7 +2824,7 @@
                 if (memoPanel) memoPanel.classList.remove('open');
 
                 const panel = document.getElementById('fav-panel') ||
-                             UIComponents.createFavPanel();
+                      UIComponents.createFavPanel();
                 UIComponents.renderFavList();
                 panel.classList.toggle('open');
             };
@@ -2792,7 +2843,7 @@
             const hasImpl = detailContent.includes('【實施方式】');
 
             const savedHeight = localStorage.getItem(CONSTANTS.STORAGE_KEYS.GALLERY_HEIGHT) ||
-                               CONSTANTS.DEFAULT_GALLERY_HEIGHT;
+                  CONSTANTS.DEFAULT_GALLERY_HEIGHT;
 
             const wrapper = document.createElement('div');
             wrapper.id = 'modern-wrapper';
@@ -2927,7 +2978,7 @@
             document.getElementById('jump-impl').onclick = () => {
                 const body = document.getElementById('d-body');
                 const target = Array.from(body.querySelectorAll('span'))
-                    .find(el => el.textContent.includes('【實施方式】'));
+                .find(el => el.textContent.includes('【實施方式】'));
 
                 if (target) {
                     target.scrollIntoView({ behavior: 'auto', block: 'start' });

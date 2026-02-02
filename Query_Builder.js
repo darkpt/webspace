@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TIPO Patent Query Builder
 // @namespace    https://github.com/darkpt/webspace/
-// @version      1.2.1
+// @version      1.2.2
 // @description  專利查詢語法產生器 — 多欄位、多條件、自動組合布林查詢
 // @author       darkpt
 // @match        https://tiponet.tipo.gov.tw/gpss2/gpsskmc/gpssbkm*
@@ -143,14 +143,13 @@
     });
 
     const kwCodes = [
-      'TI', 'AB', 'CL', 'DE', 'PA', 'AX', 'AF', 'IN', 'IV', 'LX', 'PN', 'AN',
-      'IC', 'CS', 'FC', 'TS',
+      'TI', 'AB', 'CL', 'DE', 'PA', 'IN', 'PN', 'AN', 'IC',
     ];
     const kwLabels = {
       TI: '名稱(TI)', AB: '摘要(AB)', CL: '申請範圍(CL)', DE: '說明(DE)',
-      PA: '申請人(PA)', AX: '代理人(AX)', AF: '事務所(AF)', IN: '發明人(IN)',
-      IV: '創作人(IV)', LX: '法律狀態(LX)', PN: '公告號(PN)', AN: '申請號(AN)',
-      IC: '國際分類(IC)', CS: '現行分類(CS)', FC: '初始分類(FC)', TS: '技術分類(TS)',
+      PA: '申請人(PA)', IN: '發明人(IN)',
+      PN: '公告號(PN)', AN: '申請號(AN)',
+      IC: '國際分類(IC)',
     };
     kwCodes.forEach(code => {
       map.set(code, { code, label: kwLabels[code] || code, type: FIELD_TYPES.KEYWORD });

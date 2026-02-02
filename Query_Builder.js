@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TIPO Patent Query Builder
 // @namespace    https://github.com/darkpt/webspace/
-// @version      1.2.0
+// @version      1.2.1
 // @description  專利查詢語法產生器 — 多欄位、多條件、自動組合布林查詢
 // @author       darkpt
 // @match        https://tiponet.tipo.gov.tw/gpss2/gpsskmc/gpssbkm*
@@ -1154,6 +1154,9 @@
 
         const rowEl = TQB.dom.createRowElement(rowId, isFirst);
         TQB.elements.rowsContainer.appendChild(rowEl);
+
+        const kwInput = rowEl.querySelector('[data-role="keyword"]');
+        if (kwInput) kwInput.focus();
       },
 
       /**

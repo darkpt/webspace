@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         專利內文重構 (V5.10)
+// @name         TIPO 專利內文現代化重構 (V5.20)
 // @namespace    http://tampermonkey.net/
-// @version      5.1
-// @description  修正台灣下載PDF
-// @author       Darkpt
+// @version      5.2
+// @description  修正台灣下載PDF跟加上前後翻頁的熱鍵，shift+左、右鍵
+// @author       Claude
 // @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/*
 // @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI.js
 // @downloadURL  https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI.js
@@ -52,7 +52,7 @@
             DETAIL_ROW: 'tr.rectr',
             GPS_TITLE: '#gps_title',
             FR_URL: '#FRURL',
-            IMAGE_LINK: 'a[href*="/gpsskmusr/"][href$=".png"]'
+            IMAGE_LINK: 'a[href*="/gpsskmusr/"][href$=".png"], a[href*="/gpssbkmusr/"][href$=".png"]'
         },
 
         // 訊息
@@ -681,16 +681,17 @@
 
             if (core) {
                 const hit = parsed.find(x => x.href.includes(core));
-                if (hit) return { gpssNum: hit.gpssNum, usrCode: hit.usrCode };
+                if (hit) return { gpssNum: hit.gpssNum, usrCode: hit.usrCode, usrPath: hit.usrPath };
             }
 
             const gpss2 = parsed.find(x => x.gpssNum === '2');
-            if (gpss2) return { gpssNum: gpss2.gpssNum, usrCode: gpss2.usrCode };
+            if (gpss2) return { gpssNum: gpss2.gpssNum, usrCode: gpss2.usrCode, usrPath: gpss2.usrPath };
 
             if (parsed.length) {
                 return {
                     gpssNum: parsed[0].gpssNum,
-                    usrCode: parsed[0].usrCode
+                    usrCode: parsed[0].usrCode,
+                    usrPath: parsed[0].usrPath
                 };
             }
 
@@ -735,10 +736,11 @@
          * @returns {Object|null} 解析結果
          */
         parseImageURL(href) {
-            const match = String(href).match(/\/gpss(\d)\/gpsskmusr\/(\d{5})\//i);
+            const match = String(href).match(/\/gpss(\d)\/(gpss(?:b)?kmusr)\/(\d{5})\//i);
             return match ? {
                 gpssNum: match[1],
-                usrCode: match[2],
+                usrPath: match[2].toLowerCase(),
+                usrCode: match[3],
                 href
             } : null;
         },
@@ -749,8 +751,8 @@
          */
         fallbackExtractFromHTML() {
             const html = document.body?.innerHTML || '';
-            const match = html.match(/\/gpss(\d)\/gpsskmusr\/(\d{5})\//i);
-            return match ? { gpssNum: match[1], usrCode: match[2] } : null;
+            const match = html.match(/\/gpss(\d)\/(gpss(?:b)?kmusr)\/(\d{5})\//i);
+            return match ? { gpssNum: match[1], usrPath: match[2].toLowerCase(), usrCode: match[3] } : null;
         },
 
         /**
@@ -851,8 +853,9 @@
             if (!parsed) return null;
 
             const filename = rules[parsed.type](parsed.number);
+            const usrPath = pathParams.usrPath || 'gpsskmusr';
             return {
-                url: `https://tiponet.tipo.gov.tw/gpss${pathParams.gpssNum}/gpsskmusr/${pathParams.usrCode}/pdf/${filename}.pdf`,
+                url: `https://tiponet.tipo.gov.tw/gpss${pathParams.gpssNum}/${usrPath}/${pathParams.usrCode}/pdf/${filename}.pdf`,
                 filename: `${filename}.pdf`
             };
         },
@@ -2600,6 +2603,7 @@
     // 主 UI 重構模組
     // ========================================
     const MainUI = {
+        hotkeysBound: false,
         /**
          * 重構 UI
          */
@@ -2614,6 +2618,7 @@
             this.hideOriginalElements();
             ContextMenuManager.setupEvents();
             UIComponents.createContextMenu();
+            this.setupNavHotkeys();
         },
 
         /**
@@ -2998,6 +3003,32 @@
                     }
                 });
             }
+        },
+
+        /**
+         * 設置導覽熱鍵（Shift + 左/右）
+         */
+        setupNavHotkeys() {
+            if (this.hotkeysBound) return;
+            this.hotkeysBound = true;
+
+            document.addEventListener('keydown', (e) => {
+                if (!Utils.checkIsDetail()) return;
+                if (!e.shiftKey) return;
+                if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+
+                const active = document.activeElement;
+                if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+                    return;
+                }
+
+                const targetName = (e.key === 'ArrowLeft') ? '_IMG_前筆' : '_IMG_次筆';
+                const originalBtn = document.querySelector(`input[name="${targetName}"]`);
+                if (originalBtn) {
+                    e.preventDefault();
+                    originalBtn.click();
+                }
+            });
         }
     };
 

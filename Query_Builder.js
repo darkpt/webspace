@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         TIPO Patent Query Builder
 // @namespace    https://github.com/darkpt/webspace/
-// @version      1.2.2
+// @version      1.2.3
 // @description  專利查詢語法產生器 — 多欄位、多條件、自動組合布林查詢
 // @author       darkpt
-// @match        https://tiponet.tipo.gov.tw/gpss2/gpsskmc/gpssbkm*
+// @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/gpssbkm*
 // @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/Query_Builder.js
 // @downloadURL  https://raw.githubusercontent.com/darkpt/webspace/main/Query_Builder.js
 // @grant        GM_addStyle
@@ -21,7 +21,7 @@
   const CONSTANTS = {
     // — Script identity —
     SCRIPT_NAME: 'TIPO Query Builder',
-    VERSION: '1.2.0',
+    VERSION: '1.2.3',
     PREFIX: 'tqb',
     DEBUG: false,
 
@@ -95,10 +95,16 @@
     TOAST_DURATION_MS: 2500,
     ANIMATION_DURATION_MS: 200,
 
-    // — Selectors (TIPO page) —
+    // — Selectors (TIPO page detection & query elements) —
     SELECTORS: {
-      QUERY_INPUT: 'input[name="_21_1_T"]',
-      SEARCH_BUTTON: 'input[alt="查詢"]',
+      // 頁面偵測：列表頁排除條件
+      LIST_PAGE_INDICATOR: 'select[onchange^="instback"]',
+      // 基本搜尋頁
+      QUERY_INPUT_BASIC: 'input[name="_21_1_T"]',
+      SEARCH_BUTTON_BASIC: 'input[alt="查詢"]',
+      // 進階搜尋頁
+      QUERY_INPUT_ADVANCED: 'textarea[name="_3_10_X"]',
+      SEARCH_BUTTON_ADVANCED: 'input[name="_IMG_檢索"]',
     },
 
     // — Field definitions —
@@ -142,14 +148,11 @@
       code: 'FULLTEXT', label: '全文(預設)', type: FIELD_TYPES.FULLTEXT,
     });
 
-    const kwCodes = [
-      'TI', 'AB', 'CL', 'DE', 'PA', 'IN', 'PN', 'AN', 'IC',
-    ];
+    const kwCodes = ['TI', 'AB', 'CL', 'DE', 'PA', 'IN', 'PN', 'AN', 'IC'];
     const kwLabels = {
       TI: '名稱(TI)', AB: '摘要(AB)', CL: '申請範圍(CL)', DE: '說明(DE)',
       PA: '申請人(PA)', IN: '發明人(IN)',
-      PN: '公告號(PN)', AN: '申請號(AN)',
-      IC: '國際分類(IC)',
+      PN: '公告號(PN)', AN: '申請號(AN)', IC: '國際分類(IC)',
     };
     kwCodes.forEach(code => {
       map.set(code, { code, label: kwLabels[code] || code, type: FIELD_TYPES.KEYWORD });
@@ -546,6 +549,7 @@
     state: {
       isInitialized: false,
       isPanelVisible: false,
+      pageType: null,  // 'basic' | 'advanced' | null (不支援的頁面)
       rows: [],
       rowIdCounter: 0,
       toastTimer: null,
@@ -1044,10 +1048,40 @@
 
         const removeBtn = rowEl.querySelector('.tqb-btn-remove');
         if (isYear) {
-          rowEl.insertBefore(TQB.dom.createYearInputs(rowId), removeBtn);
+          const yearFrag = TQB.dom.createYearInputs(rowId);
+          rowEl.insertBefore(yearFrag, removeBtn);
+          TQB.dom.restoreYearValues(rowEl, rowId);
         } else {
-          rowEl.insertBefore(TQB.dom.createKeywordInput(rowId), removeBtn);
+          const kwInput = TQB.dom.createKeywordInput(rowId);
+          rowEl.insertBefore(kwInput, removeBtn);
+          TQB.dom.restoreKeywordValue(kwInput, rowId);
         }
+      },
+
+      /**
+       * 回填 keyword input 的值（從 state）
+       * @param {HTMLInputElement} input
+       * @param {number} rowId
+       */
+      restoreKeywordValue(input, rowId) {
+        const rowData = TQB.state.rows.find(r => r.id === rowId);
+        if (rowData && rowData.rawInput) {
+          input.value = rowData.rawInput;
+        }
+      },
+
+      /**
+       * 回填 year inputs 的值（從 state）
+       * @param {HTMLElement} rowEl
+       * @param {number} rowId
+       */
+      restoreYearValues(rowEl, rowId) {
+        const rowData = TQB.state.rows.find(r => r.id === rowId);
+        if (!rowData) return;
+        const fromInput = rowEl.querySelector('[data-role="yearFrom"]');
+        const toInput = rowEl.querySelector('[data-role="yearTo"]');
+        if (fromInput && rowData.yearFrom) fromInput.value = rowData.yearFrom;
+        if (toInput && rowData.yearTo) toInput.value = rowData.yearTo;
       },
 
       /**
@@ -1285,7 +1319,9 @@
       },
 
       /**
-       * 處理欄位切換（切換輸入模式與 checkbox）
+       * 處理欄位切換
+       * FULLTEXT / KEYWORD 視為同類（文字輸入），切換時保留 rawInput
+       * 僅切換至/從 RANGE_YEAR 時才清空輸入值
        * @param {number} rowId
        * @param {string} fieldCode
        */
@@ -1295,11 +1331,21 @@
 
         const prevDef = FIELD_MAP.get(rowData.fieldCode);
         const newDef = FIELD_MAP.get(fieldCode);
+        const { FIELD_TYPES } = CONSTANTS;
+
+        const isTextType = (t) => t === FIELD_TYPES.FULLTEXT || t === FIELD_TYPES.KEYWORD;
+        const prevIsText = isTextType(prevDef?.type);
+        const newIsText = isTextType(newDef?.type);
+        const needsClear = prevIsText !== newIsText;
+
         rowData.fieldCode = fieldCode;
-        rowData.rawInput = '';
-        rowData.yearFrom = '';
-        rowData.yearTo = '';
         rowData.useAtSyntax = false;
+
+        if (needsClear) {
+          rowData.rawInput = '';
+          rowData.yearFrom = '';
+          rowData.yearTo = '';
+        }
 
         const rowEl = TQB.elements.rowsContainer.querySelector(
           `[data-row-id="${rowId}"]`
@@ -1311,7 +1357,7 @@
         if (prevDef?.type !== newDef?.type) {
           TQB.dom.switchRowInputMode(rowEl, fieldCode, rowId);
         } else {
-          const isKw = newDef?.type === CONSTANTS.FIELD_TYPES.KEYWORD;
+          const isKw = newDef?.type === FIELD_TYPES.KEYWORD;
           TQB.dom.updateAtCheckboxVisibility(rowEl, isKw);
         }
       },
@@ -1348,10 +1394,21 @@
 
       /**
        * 將查詢字串套用至 TIPO 頁面並觸發搜尋
+       * 依 pageType 決定使用基本或進階搜尋的元素
        * @param {string} query
        */
       applyToPage(query) {
-        const input = document.querySelector(CONSTANTS.SELECTORS.QUERY_INPUT);
+        const { SELECTORS } = CONSTANTS;
+        const isAdvanced = TQB.state.pageType === 'advanced';
+
+        const inputSel = isAdvanced
+          ? SELECTORS.QUERY_INPUT_ADVANCED
+          : SELECTORS.QUERY_INPUT_BASIC;
+        const btnSel = isAdvanced
+          ? SELECTORS.SEARCH_BUTTON_ADVANCED
+          : SELECTORS.SEARCH_BUTTON_BASIC;
+
+        const input = document.querySelector(inputSel);
         if (!input) {
           TQB.dom.showToast('找不到查詢輸入框', 'error');
           return;
@@ -1360,7 +1417,7 @@
         input.dispatchEvent(new Event('input', { bubbles: true }));
         input.dispatchEvent(new Event('change', { bubbles: true }));
 
-        const btn = document.querySelector(CONSTANTS.SELECTORS.SEARCH_BUTTON);
+        const btn = document.querySelector(btnSel);
         if (!btn) {
           TQB.dom.showToast('語法已填入，但找不到搜尋按鈕', 'error');
           return;
@@ -1416,10 +1473,42 @@
     // §4.5 — init (single entry point)
     // ─────────────────────────────────────────────────────
 
-    /** 初始化腳本：注入樣式、建立 DOM、綁定事件 */
+    /**
+     * 偵測當前頁面類型
+     * @returns {'basic'|'advanced'|null}
+     */
+    detectPageType() {
+      const { SELECTORS } = CONSTANTS;
+
+      // 列表頁排除
+      if (document.querySelector(SELECTORS.LIST_PAGE_INDICATOR)) {
+        return null;
+      }
+      // 基本搜尋頁
+      if (document.querySelector(SELECTORS.QUERY_INPUT_BASIC)) {
+        return 'basic';
+      }
+      // 進階搜尋頁
+      if (document.querySelector(SELECTORS.QUERY_INPUT_ADVANCED)) {
+        return 'advanced';
+      }
+      // 其他頁面（內文等）
+      return null;
+    },
+
+    /** 初始化腳本：偵測頁面、注入樣式、建立 DOM、綁定事件 */
     init() {
       if (TQB.state.isInitialized) return;
       TQB.state.isInitialized = true;
+
+      // 頁面偵測
+      TQB.state.pageType = TQB.detectPageType();
+      if (!TQB.state.pageType) {
+        if (CONSTANTS.DEBUG) {
+          console.log(`[${CONSTANTS.SCRIPT_NAME}] 非搜尋頁面，略過初始化`);
+        }
+        return;
+      }
 
       try {
         TQB.dom.injectStyles();
@@ -1438,7 +1527,7 @@
 
         if (CONSTANTS.DEBUG) {
           console.log(
-            `[${CONSTANTS.SCRIPT_NAME}] v${CONSTANTS.VERSION} initialized.`
+            `[${CONSTANTS.SCRIPT_NAME}] v${CONSTANTS.VERSION} initialized (${TQB.state.pageType}).`
           );
         }
       } catch (err) {

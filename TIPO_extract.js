@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         TIPONET 全文抓取：自動翻頁抓取 (v2.0)
+// @name         TIPONET 全文抓取：自動翻頁抓取 (v2.1)
 // @namespace    https://tampermonkey.net/
-// @version      2.0
-// @description  自動翻頁抓取公開公告號，增強穩定性：延長延遲時間、重試機制、每100筆自動輸出，輸出 Markdown + CSV 格式
+// @version      2.1
+// @description  自動翻頁抓取公開公告號，修正拖曳面板到邊界縮放會消失的問題
 // @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/gpssbkm*
 // @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/TIPO_extract.js
 // @downloadURL  https://raw.githubusercontent.com/darkpt/webspace/main/TIPO_extract.js
@@ -805,6 +805,26 @@
         const isSettingsCollapsed = GM_getValue(SETTINGS_COLLAPSED_KEY, false);
         const selectedPanels = getSelectedPanels();
 
+        function clampToolbarToViewport(container) {
+            const rect = container.getBoundingClientRect();
+            let right = parseInt(container.style.right, 10);
+            let bottom = parseInt(container.style.bottom, 10);
+
+            if (Number.isNaN(right)) right = savedPosition.right ?? 12;
+            if (Number.isNaN(bottom)) bottom = savedPosition.bottom ?? 12;
+
+            const maxRight = Math.max(10, window.innerWidth - rect.width - 10);
+            const maxBottom = Math.max(10, window.innerHeight - rect.height - 10);
+
+            right = Math.max(10, Math.min(right, maxRight));
+            bottom = Math.max(10, Math.min(bottom, maxBottom));
+
+            container.style.right = `${right}px`;
+            container.style.bottom = `${bottom}px`;
+
+            GM_setValue(POSITION_KEY, { right, bottom });
+        }
+
         const container = document.createElement('div');
         container.id = 'tiponet-toolbar';
         container.style.cssText = `
@@ -1063,6 +1083,7 @@
         container.appendChild(header);
         container.appendChild(mainContainer);
         document.body.appendChild(container);
+        clampToolbarToViewport(container);
 
         // === 展開/收合功能 ===
         toggleBtn.addEventListener('click', (e) => {
@@ -1118,10 +1139,7 @@
             if (isDragging) {
                 isDragging = false;
                 header.style.cursor = 'move';
-                GM_setValue(POSITION_KEY, {
-                    right: parseInt(container.style.right),
-                    bottom: parseInt(container.style.bottom)
-                });
+                clampToolbarToViewport(container);
             }
         });
 
@@ -1157,11 +1175,12 @@
         document.addEventListener('touchend', () => {
             if (isDragging) {
                 isDragging = false;
-                GM_setValue(POSITION_KEY, {
-                    right: parseInt(container.style.right),
-                    bottom: parseInt(container.style.bottom)
-                });
+                clampToolbarToViewport(container);
             }
+        });
+
+        window.addEventListener('resize', () => {
+            clampToolbarToViewport(container);
         });
     }
 

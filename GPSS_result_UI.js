@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         TIPO 專利內文現代化重構 (V5.20)
+// @name         TIPO 專利內文現代化重構 (V5.30)
 // @namespace    http://tampermonkey.net/
 // @version      5.2
 // @description  修正台灣下載PDF跟加上前後翻頁的熱鍵，shift+左、右鍵
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 
-(function() {
+(function () {
     'use strict';
 
     // ========================================
@@ -146,7 +146,7 @@
         downloadFile(content, filename, mimeType) {
             try {
                 const bom = mimeType.includes('text') ? '\uFEFF' : '';
-                const blob = new Blob([bom + content], { type: mimeType });
+                const blob = new Blob([bom + content]);
                 const url = URL.createObjectURL(blob);
 
                 const a = document.createElement('a');
@@ -365,7 +365,7 @@
                 }
 
                 const exists = all[patent.number].annotations
-                .some(a => a.text === trimmedText);
+                    .some(a => a.text === trimmedText);
 
                 if (exists) {
                     return {
@@ -603,7 +603,7 @@
                     const firstLink = value?.querySelector('a');
                     applicant = firstLink
                         ? firstLink.textContent.trim()
-                    : (value?.textContent.trim().split(';')[0].trim() || '');
+                        : (value?.textContent.trim().split(';')[0].trim() || '');
                 }
             });
 
@@ -860,134 +860,6 @@
             };
         },
 
-        /**
- * 下載全文 PDF（自動偵測國別）
- */
-        async download() {
-            const patent = PageExtractor.extractCurrentPatent();
-            const country = patent.country;
-
-            if (!country) {
-                Utils.showToast(CONSTANTS.MESSAGES.NO_APPLICATION_NUMBER);
-                return;
-            }
-
-            if (country !== 'TW') {
-                Utils.showToast(CONSTANTS.MESSAGES.COUNTRY_NOT_SUPPORTED);
-                return;
-            }
-
-            const result = this.generateDownloadURL(country);
-            console.log('[FullTextDownloader]', {
-                applicationNumber: patent.applicationNumber,
-                detectedCountry: country,
-                generatedURL: result?.url || null,
-                filename: result?.filename || null
-            });
-
-            if (!result) {
-                alert('無法產生下載連結');
-                return;
-            }
-
-            try {
-                const response = await this.fetchPDF(result.url);
-
-                if (!response.ok) {
-                    this.handleDownloadError(response.status, result.url);
-                    return;
-                }
-
-                const buffer = await response.arrayBuffer();
-
-                if (!this.validatePDF(buffer, result.url)) {
-                    return;
-                }
-
-                this.savePDF(buffer, result.filename);
-
-            } catch (e) {
-                this.handleDownloadException(e, result.url);
-            }
-        },
-
-        /**
-         * 取得 PDF 檔案
-         * @param {string} url - PDF URL
-         * @returns {Promise<Response>} Fetch Response
-         */
-        async fetchPDF(url) {
-            return await fetch(url, {
-                method: 'GET',
-                credentials: 'include',
-                cache: 'no-store'
-            });
-        },
-
-        /**
-         * 驗證 PDF 內容
-         * @param {ArrayBuffer} buffer - PDF 內容
-         * @param {string} url - PDF URL
-         * @returns {boolean} 驗證結果
-         */
-        validatePDF(buffer, url) {
-            if (buffer.byteLength < 5) {
-                alert('下載內容異常（內容過短），將開啟原連結供確認。');
-                window.open(url, '_blank', 'noopener');
-                return false;
-            }
-
-            const head = new TextDecoder('ascii').decode(buffer.slice(0, 4));
-            if (head !== '%PDF') {
-                alert('下載到的內容不是 PDF（可能是導頁/錯誤頁/權限頁），將開啟原連結供確認。');
-                window.open(url, '_blank', 'noopener');
-                return false;
-            }
-
-            return true;
-        },
-
-        /**
-         * 儲存 PDF 檔案
-         * @param {ArrayBuffer} buffer - PDF 內容
-         * @param {string} filename - 檔案名稱
-         */
-        savePDF(buffer, filename) {
-            const blob = new Blob([buffer], { type: CONSTANTS.MIME_TYPES.PDF });
-            const objectUrl = URL.createObjectURL(blob);
-
-            const a = document.createElement('a');
-            a.href = objectUrl;
-            a.download = filename;
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-
-            setTimeout(() => {
-                URL.revokeObjectURL(objectUrl);
-                document.body.removeChild(a);
-            }, CONSTANTS.CLEANUP_DELAY);
-        },
-
-        /**
-         * 處理下載錯誤
-         * @param {number} status - HTTP 狀態碼
-         * @param {string} url - PDF URL
-         */
-        handleDownloadError(status, url) {
-            alert(`下載失敗：HTTP ${status}\n將開啟原連結供確認。`);
-            window.open(url, '_blank', 'noopener');
-        },
-
-        /**
-         * 處理下載例外
-         * @param {Error} error - 錯誤物件
-         * @param {string} url - PDF URL
-         */
-        handleDownloadException(error, url) {
-            alert(`下載例外：${error?.message || error}\n將開啟原連結供確認。`);
-            window.open(url, '_blank', 'noopener');
-        }
     };
 
     // ========================================
@@ -1001,7 +873,7 @@
             if (document.getElementById('modern-style')) return;
 
             const savedHeight = localStorage.getItem(CONSTANTS.STORAGE_KEYS.GALLERY_HEIGHT) ||
-                  CONSTANTS.DEFAULT_GALLERY_HEIGHT;
+                CONSTANTS.DEFAULT_GALLERY_HEIGHT;
 
             const styles = `
                 #modern-style {}
@@ -1106,22 +978,6 @@
 
                 .header-nav-btn:hover {
                     background: rgba(255,255,255,0.3);
-                }
-
-                .header-download-btn {
-                    background: #ea4c89;
-                    color: #fff;
-                    border: none;
-                    border-radius: 20px;
-                    padding: 8px 16px;
-                    font-size: 13px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-
-                .header-download-btn:hover {
-                    background: #d63d7a;
                 }
 
                 /* ========================================
@@ -2119,7 +1975,7 @@
          */
         createAnnotationItemHTML(annotation, index) {
             const timeStr = annotation.addedAt ?
-                  annotation.addedAt.slice(0, 16).replace('T', ' ') : '';
+                annotation.addedAt.slice(0, 16).replace('T', ' ') : '';
 
             return `
                 <div class="memo-annotation-item" data-index="${index}">
@@ -2332,7 +2188,7 @@
          */
         show(x, y) {
             const menu = document.getElementById('custom-context-menu') ||
-                  UIComponents.createContextMenu();
+                UIComponents.createContextMenu();
 
             if (this.textCaptureCallback) {
                 this.textCaptureCallback();
@@ -2378,9 +2234,9 @@
                 const target = e.target;
 
                 const isInContentArea = target.closest('#d-body') ||
-                      target.closest('.card-body') ||
-                      target.closest('#panel-content') ||
-                      target.closest('#modern-wrapper');
+                    target.closest('.card-body') ||
+                    target.closest('#panel-content') ||
+                    target.closest('#modern-wrapper');
 
                 if (selectedText && selectedText.length > 0 && isInContentArea) {
                     e.preventDefault();
@@ -2742,12 +2598,10 @@
 
             const memoBtn = this.createMemoButton();
             const navButtons = this.createNavButtons();
-            const downloadBtn = this.createDownloadButton();
             const favListBtn = this.createFavListButton();
 
             right.appendChild(memoBtn);
             navButtons.forEach(btn => right.appendChild(btn));
-            right.appendChild(downloadBtn);
             right.appendChild(favListBtn);
 
             return right;
@@ -2768,7 +2622,7 @@
                 if (favPanel) favPanel.classList.remove('open');
 
                 const panel = document.getElementById('memo-panel') ||
-                      UIComponents.createMemoPanel();
+                    UIComponents.createMemoPanel();
                 UIComponents.renderMemoList();
                 panel.classList.toggle('open');
             };
@@ -2802,19 +2656,6 @@
         },
 
         /**
- * 建立下載按鈕
- * @returns {HTMLElement} 下載按鈕
- */
-        createDownloadButton() {
-            const btn = document.createElement('button');
-            btn.className = 'header-download-btn';
-            btn.innerHTML = '📄 下載全文';
-            btn.onclick = () => FullTextDownloader.download();
-
-            return btn;
-        },
-
-        /**
          * 建立收藏列表按鈕
          * @returns {HTMLElement} 收藏列表按鈕
          */
@@ -2829,7 +2670,7 @@
                 if (memoPanel) memoPanel.classList.remove('open');
 
                 const panel = document.getElementById('fav-panel') ||
-                      UIComponents.createFavPanel();
+                    UIComponents.createFavPanel();
                 UIComponents.renderFavList();
                 panel.classList.toggle('open');
             };
@@ -2848,7 +2689,7 @@
             const hasImpl = detailContent.includes('【實施方式】');
 
             const savedHeight = localStorage.getItem(CONSTANTS.STORAGE_KEYS.GALLERY_HEIGHT) ||
-                  CONSTANTS.DEFAULT_GALLERY_HEIGHT;
+                CONSTANTS.DEFAULT_GALLERY_HEIGHT;
 
             const wrapper = document.createElement('div');
             wrapper.id = 'modern-wrapper';
@@ -2926,7 +2767,7 @@
          * 設置左側書目面板
          */
         setupLeftPanel() {
-            document.getElementById('panel-toggle').onclick = function() {
+            document.getElementById('panel-toggle').onclick = function () {
                 const panel = document.getElementById('left-panel');
                 panel.classList.toggle('collapsed');
                 this.innerText = panel.classList.contains('collapsed') ?
@@ -2983,7 +2824,7 @@
             document.getElementById('jump-impl').onclick = () => {
                 const body = document.getElementById('d-body');
                 const target = Array.from(body.querySelectorAll('span'))
-                .find(el => el.textContent.includes('【實施方式】'));
+                    .find(el => el.textContent.includes('【實施方式】'));
 
                 if (target) {
                     target.scrollIntoView({ behavior: 'auto', block: 'start' });

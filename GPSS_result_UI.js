@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         TIPO 專利內文現代化重構 (V5.30)
+// @name         TIPO 專利內文現代化重構 (V5.40)
 // @namespace    http://tampermonkey.net/
-// @version      5.2
-// @description  修正台灣下載PDF跟加上前後翻頁的熱鍵，shift+左、右鍵
+// @version      5.4
+// @description  修復全文下載
 // @author       Claude
 // @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/*
 // @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI.js
@@ -860,6 +860,29 @@
             };
         },
 
+        /**
+         * 從原頁籤的 harder(this, '{content}') 取得全文路徑
+         * @returns {string} 全文路徑
+         */
+        extractHarderContent() {
+            const target = document.querySelector('.menu62 .dettabimg1.sub-menu62[onclick*="harder"]') ||
+                document.querySelector('.menu62 [onclick*="harder"]');
+            const onclick = target?.getAttribute('onclick') || '';
+            const match = onclick.match(/harder\s*\(\s*this\s*,\s*(['"])(.*?)\1\s*\)/);
+            return match ? match[2].trim() : '';
+        },
+
+        /**
+         * 產生原站全文頁 URL
+         * @returns {string} 全文頁 URL
+         */
+        generateHarderFullTextURL() {
+            const content = this.extractHarderContent();
+            if (!content) return '';
+            if (/^https?:\/\//i.test(content)) return content;
+            return `https://tiponet.tipo.gov.tw/${content.replace(/^\/+/, '')}`;
+        },
+
     };
 
     // ========================================
@@ -978,6 +1001,22 @@
 
                 .header-nav-btn:hover {
                     background: rgba(255,255,255,0.3);
+                }
+
+                .header-download-btn {
+                    background: rgba(33, 150, 243, 0.9);
+                    color: #fff;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 6px 12px;
+                    font-size: 13px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+
+                .header-download-btn:hover {
+                    background: rgba(33, 150, 243, 1);
                 }
 
                 /* ========================================
@@ -2597,10 +2636,12 @@
             right.id = 'header-right';
 
             const memoBtn = this.createMemoButton();
+            const fullTextBtn = this.createFullTextButton();
             const navButtons = this.createNavButtons();
             const favListBtn = this.createFavListButton();
 
             right.appendChild(memoBtn);
+            right.appendChild(fullTextBtn);
             navButtons.forEach(btn => right.appendChild(btn));
             right.appendChild(favListBtn);
 
@@ -2634,6 +2675,28 @@
          * 建立導覽按鈕
          * @returns {Array<HTMLElement>} 按鈕陣列
          */
+        createFullTextButton() {
+            const btn = document.createElement('button');
+            btn.id = 'full-text-download-btn';
+            btn.className = 'header-download-btn';
+            btn.textContent = '下載全文';
+
+            btn.onclick = () => {
+                const url = FullTextDownloader.generateHarderFullTextURL();
+                if (!url) {
+                    Utils.showToast('無法取得全文連結');
+                    return;
+                }
+
+                const opened = window.open(url, '_blank', 'noopener');
+                if (!opened) {
+                    Utils.showToast(CONSTANTS.MESSAGES.DOWNLOAD_BLOCKED);
+                }
+            };
+
+            return btn;
+        },
+
         createNavButtons() {
             const navDefs = [
                 { name: '_IMG_回查詢', label: '回查詢', icon: '🔍' },

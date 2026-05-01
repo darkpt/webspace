@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         TIPO 專利內文現代化重構 (V5.40)
+// @name         TIPO 專利內文現代化重構 (V5.50)
 // @namespace    http://tampermonkey.net/
 // @version      5.4
-// @description  修復全文下載
+// @description  修復全文下載，改由跳現其他頁面
 // @author       Claude
 // @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/*
 // @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI.js
@@ -865,10 +865,17 @@
          * @returns {string} 全文路徑
          */
         extractHarderContent() {
-            const target = document.querySelector('.menu62 .dettabimg1.sub-menu62[onclick*="harder"]') ||
-                document.querySelector('.menu62 [onclick*="harder"]');
+            const links = document.querySelectorAll('.menu62 .sub-menu62 a');
+
+            const keywords = ['公開說明書', '公告說明書'];
+
+            const target = Array.from(links).find(el =>
+                                                  keywords.some(k => el.textContent.includes(k))
+                                                 );
+
             const onclick = target?.getAttribute('onclick') || '';
             const match = onclick.match(/harder\s*\(\s*this\s*,\s*(['"])(.*?)\1\s*\)/);
+
             return match ? match[2].trim() : '';
         },
 

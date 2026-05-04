@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TIPO 專利內文現代化重構 (V5.50)
 // @namespace    http://tampermonkey.net/
-// @version      5.4
+// @version      5.5
 // @description  修復全文下載，改由跳現其他頁面
 // @author       Claude
 // @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/*

@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         TIPO 專利內文現代化重構 (V5.50)
+// @name         TIPO 專利內文現代化重構 (V5.60)
 // @namespace    http://tampermonkey.net/
-// @version      5.5
-// @description  修復全文下載，改由跳現其他頁面
+// @version      5.6
+// @description  增加複製連結的功能
 // @author       Claude
 // @match        https://tiponet.tipo.gov.tw/gpss*/gpsskmc/*
 // @updateURL    https://raw.githubusercontent.com/darkpt/webspace/main/GPSS_result_UI.js
@@ -870,8 +870,8 @@
             const keywords = ['公開說明書', '公告說明書'];
 
             const target = Array.from(links).find(el =>
-                                                  keywords.some(k => el.textContent.includes(k))
-                                                 );
+                keywords.some(k => el.textContent.includes(k))
+            );
 
             const onclick = target?.getAttribute('onclick') || '';
             const match = onclick.match(/harder\s*\(\s*this\s*,\s*(['"])(.*?)\1\s*\)/);
@@ -2644,11 +2644,13 @@
 
             const memoBtn = this.createMemoButton();
             const fullTextBtn = this.createFullTextButton();
+            const copyLinkBtn = this.createCopyLinkButton();
             const navButtons = this.createNavButtons();
             const favListBtn = this.createFavListButton();
 
             right.appendChild(memoBtn);
             right.appendChild(fullTextBtn);
+            right.appendChild(copyLinkBtn);
             navButtons.forEach(btn => right.appendChild(btn));
             right.appendChild(favListBtn);
 
@@ -2695,9 +2697,42 @@
                     return;
                 }
 
-                const opened = window.open(url, '_blank', 'noopener');
+                /*const opened = window.open(url, '_blank', 'noopener');*/
+                const features = 'width=1000,height=800,menubar=no,toolbar=no,location=no,status=no,noopener';
+                const opened = window.open(url, '_blank', features);
                 if (!opened) {
                     Utils.showToast(CONSTANTS.MESSAGES.DOWNLOAD_BLOCKED);
+                }
+            };
+
+            return btn;
+        },
+
+        /**
+         * 建立複製連結按鈕
+         * @returns {HTMLElement} 複製連結按鈕
+         */
+        createCopyLinkButton() {
+            const btn = document.createElement('button');
+            btn.id = 'copy-frurl-btn';
+            btn.className = 'header-download-btn';
+            btn.textContent = '複製連結';
+
+            btn.onclick = async () => {
+                const urlInput = document.querySelector(CONSTANTS.SELECTORS.FR_URL);
+                const url = urlInput?.value?.trim();
+
+                if (!url) {
+                    Utils.showToast('無法取得連結');
+                    return;
+                }
+
+                try {
+                    await navigator.clipboard.writeText(url);
+                    Utils.showToast(CONSTANTS.MESSAGES.COPY_SUCCESS);
+                } catch (error) {
+                    console.error('[Copy FRURL Error]', error);
+                    Utils.showToast(CONSTANTS.MESSAGES.COPY_FAILED);
                 }
             };
 

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日本山陰山陽旅遊手冊</title>
+  <style>
+    :root {
+      --ink: #1f2933;
+      --muted: #52606d;
+      --paper: #f7f3ec;
+      --card: rgba(255, 252, 247, 0.94);
+      --line: rgba(86, 72, 55, 0.12);
+      --accent: #9a3412;
+      --accent-2: #0f766e;
+      --sand: #e7c48b;
+      --shadow: 0 18px 42px rgba(54, 35, 18, 0.12);
+      --radius: 24px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 236, 205, 0.95), transparent 32%),
+        radial-gradient(circle at top right, rgba(206, 236, 229, 0.9), transparent 28%),
+        linear-gradient(180deg, #f9f4ea 0%, #f2ece2 40%, #efe7dc 100%);
+      line-height: 1.7;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(154, 52, 18, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(154, 52, 18, 0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent 75%);
+    }
+
+    .wrap {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 40px 0 28px;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 32px;
+      padding: 36px;
+      background:
+        linear-gradient(140deg, rgba(255, 251, 245, 0.96), rgba(248, 243, 236, 0.9)),
+        url("https://commons.wikimedia.org/wiki/Special:FilePath/Tottori%20Sand%20Dunes.jpg") center/cover;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      isolation: isolate;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(255, 247, 238, 0.95), rgba(255, 247, 238, 0.76) 46%, rgba(255, 247, 238, 0.28));
+      z-index: -1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(154, 52, 18, 0.08);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      margin: 16px 0 10px;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 12ch;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 62ch;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .summary div {
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .summary strong {
+      display: block;
+      font-size: 24px;
+      color: var(--accent);
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      padding: 14px 0 8px;
+      backdrop-filter: blur(12px);
+      background: linear-gradient(180deg, rgba(242, 236, 226, 0.92), rgba(242, 236, 226, 0.58), transparent);
+    }
+
+    .toolbar-inner {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      border-radius: 22px;
+      background: rgba(255, 252, 247, 0.76);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow: 0 10px 25px rgba(31, 41, 51, 0.08);
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filters button,
+    .jump a {
+      border: 0;
+      text-decoration: none;
+      cursor: pointer;
+      font: inherit;
+      color: var(--muted);
+      background: rgba(154, 52, 18, 0.07);
+      padding: 10px 14px;
+      border-radius: 999px;
+      transition: 0.2s ease;
+    }
+
+    .filters button.active,
+    .filters button:hover,
+    .jump a:hover {
+      background: var(--accent);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .jump {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    main {
+      padding: 18px 0 44px;
+    }
+
+    .cards {
+      display: grid;
+      gap: 22px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+    }
+
+    .visual {
+      position: relative;
+      min-height: 320px;
+      background: #ddd;
+    }
+
+    .visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .visual-badge {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(17, 24, 39, 0.78);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .title-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .title-row h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 32px);
+      line-height: 1.15;
+    }
+
+    .spot-no {
+      min-width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), #c2410c);
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .meta span {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.08);
+    }
+
+    .lead {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .highlights {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .highlights div {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(231, 196, 139, 0.16);
+      border: 1px solid rgba(154, 52, 18, 0.08);
+    }
+
+    .highlights strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--accent);
+    }
+
+    details {
+      background: rgba(15, 118, 110, 0.06);
+      border-radius: 18px;
+      padding: 14px 16px;
+    }
+
+    details summary {
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--accent-2);
+    }
+
+    .prep {
+      margin-top: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .prep div {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.68);
+    }
+
+    .map-frame {
+      width: 100%;
+      height: 230px;
+      border: 0;
+      border-radius: 18px;
+      background: #f2f2f2;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .links a {
+      text-decoration: none;
+      color: var(--accent);
+      font-weight: 700;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(154, 52, 18, 0.08);
+    }
+
+    footer {
+      padding: 0 0 40px;
+    }
+
+    .foot {
+      padding: 24px;
+      border-radius: 24px;
+      background: rgba(255, 252, 247, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow: 0 12px 30px rgba(31, 41, 51, 0.08);
+      color: var(--muted);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 980px) {
+      .summary,
+      .highlights,
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .visual {
+        min-height: 260px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hero-card,
+      .content {
+        padding: 22px;
+      }
+
+      .toolbar-inner {
+        align-items: flex-start;
+      }
+
+      h1 {
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <section class="hero-card">
+        <span class="eyebrow">San'in &amp; San'yo Travel Booklet</span>
+        <h1>日本山陰山陽旅遊手冊</h1>
+        <p>整理第 2 天到第 5 天的景點，結合照片、地圖與 PREP 歷史人文導覽，做成旅途中能快速翻閱的單頁手冊。適合手機查看，也能在桌機上完整瀏覽。</p>
+        <div class="summary">
+          <div><strong>11</strong>個景點</div>
+          <div><strong>4</strong>天行程</div>
+          <div><strong>3</strong>大主題日</div>
+          <div><strong>PREP</strong>深度補充</div>
+        </div>
+      </section>
+    </header>
+
+    <section class="toolbar" aria-label="景點篩選">
+      <div class="toolbar-inner">
+        <div class="filters">
+          <button class="active" data-filter="all">全部景點</button>
+          <button data-filter="day2">第 2 天</button>
+          <button data-filter="day34">第 3-4 天</button>
+          <button data-filter="day5">第 5 天</button>
+        </div>
+        <div class="jump">
+          <a href="#top-spots">快速開始</a>
+          <a href="#sources">照片與資料來源</a>
+        </div>
+      </div>
+    </section>
+
+    <main>
+      <section id="top-spots" class="cards"></section>
+    </main>
+
+    <footer id="sources">
+      <section class="foot">
+        <strong>使用說明</strong>
+        <p>本手冊的照片與部分地點資訊來自 Wikimedia Commons、Wikipedia 與官方旅遊網站。地圖採可嵌入的 Google Maps 檢視；若網路較慢，地圖與照片可能需要幾秒鐘載入。</p>
+        <p>若之後想改成可列印 A4、加入交通時間表、或改成日文／英文雙語版，這份 HTML 可直接延伸。</p>
+      </section>
+    </footer>
+  </div>
+
+  <script>
+    const spots = [
+      {
+        no: "01",
+        day: "day2",
+        dayLabel: "第 2 天",
+        title: "奈義町現代美術館",
+        area: "岡山縣奈義町",
+        tags: ["藝術建築", "自然景觀", "沉浸式空間"],
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Nagi%20MOCA.jpg",
+        imageCredit: "Wikimedia Commons",
+        mapQuery: "Nagi Museum of Contemporary Art Okayama Japan",
+        lead: "由磯崎新設計的代表性美術館，最迷人的地方不只在作品本身，而是建築、光線與地景被一起設計成展覽。",
+        fun: "必看「太陽」展間，曲面斜地板與蹺蹺板會讓身體產生失衡感，是少見的感官型藝術體驗。",
+        scene: "從館內到咖啡廳都能感受作品與那岐山景緻互相滲透，屬於安靜卻非常有記憶點的景點。",
+        visit: "常設展以「大地」「太陽」「月亮」為主題，若遇休館或撤展，團體行程常改訪鳥取砂之美術館。",
+        prep: {
+          p1: "奈義町現代美術館開創了「作品與建築一體化」的公共藝術模式。",
+          r: "它從規劃初期就讓建築師與藝術家共同設計，因此空間不是容器，而是作品的一部分。",
+          e: "例如「太陽」展間的採光軸線，是依照自然光進入方式精準計算，讓日照本身成為作品元素。",
+          p2: "也因此，它在日本現代建築史與公共藝術發展中一直被視為很有代表性的案例。"
+        },
+        infoLink: "https://en.wikipedia.org/wiki/Nagi_Museum_of_Contemporary_Art",
+        photoLink: "https://commons.wikimedia.org/wiki/Category:Nagi_Museum_Of_Contemporary_Art"
+      },
+      {
+        no: "02",
+        day: "day2",
+        dayLabel: "第 2 天",
+        title: "鳥取砂丘",
+        area: "鳥取縣鳥取市",
+        tags: ["地質奇景", "海岸景觀", "戶外活動"],
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Tottori%20Sand%20Dunes.jpg",
+        imageCredit: "Wikimedia Commons",
+        mapQuery: "Tottori Sand Dunes Japan",
+        lead: "日本最具代表性的砂丘景觀，壯闊感來自海風、洋流與長時間堆積作用共同雕塑出的地貌。",
+        fun: "可以體驗騎駱駝拍照、沙板、滑翔傘等活動；光是沿著稜線走上去看風紋就很值得。",
+        scene: "面向日本海的沙丘在陽光、海風與坡面陰影作用下，會呈現像沙海一樣的層次與曲線。",
+        visit: "這裡同時是國家天然紀念物與日本地質百選，也是鳥取最具辨識度的招牌景點。",
+        prep: {
+          p1: "鳥取砂丘像一座還在持續變化中的天然地質博物館。",
+          r: "中國山地花崗岩風化後，經千代川搬運入海，再被冬季強風與洋流推回岸邊，長年累積成砂丘。",
+          e: "地層內包含古老的大山火山灰層，讓研究者得以推估日本列島過去的火山活動週期。",
+          p2: "所以它不只是一片很美的沙地，更是認識日本地質演變的重要現場。"
+        },
+        infoLink: "https://en.wikipedia.org/wiki/Tottori_Sand_Dunes",
+        photoLink: "https://commons.wikimedia.org/wiki/Category:Tottori_Sand_Dunes"
+      },
+      {
+        no: "03",
+        day: "day2",
+        dayLabel: "第 2 天",
+        title: "白兔海岸與白兔神社",
+        area: "鳥取縣鳥取市白兔",
+        tags: ["日本神話", "戀愛祈願", "海岸散策"],
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Hakutojinjahonden.JPG",
+        imageCredit: "Wikimedia Commons",
+        mapQuery: "Hakuto Shrine Tottori Japan",
+        lead: "這裡把海岸風景與神話故事直接連在一起，是理解《因幡白兔》傳說最有臨場感的地方。",
+        fun: "若跟著導覽或先讀故事再走，會很容易把海岸上的岩礁、白兔與大國主神的情節對上畫面。",
+        scene: "白兔海岸開闊、神社規模不算巨大，但因神話濃度很高，整體氣氛特別有故事感。",
+        visit: "白兔神社常被視為姻緣與療癒信仰名所，也有「戀人的聖地」形象。",
+        prep: {
+          p1: "白兔神社是日本醫療與姻緣信仰的重要源頭之一。",
+          r: "神話中白兔不只牽起大國主神與八上姬的緣分，還留下以蒲黃花粉治療皮膚傷處的情節。",
+          e: "《古事記》記錄了這段故事，而神社境內的不老池也被地方傳承連結到白兔療傷的場景。",
+          p2: "因此這裡並非單純的觀光神社，而是古典文獻、地方信仰與地景想像交會的核心。"
+        },
+        infoLink: "https://en.wikipedia.org/wiki/Hakuto_Shrine",
+        photoLink: "https://commons.wikimedia.org/wiki/Category:Hakuto-jinja"
+      },
+      {
+        no: "04",
+        day: "day34",
+        dayLabel: "第 3-4 天",
+        title: "由志園",
+        area: "島根縣松江市大根島",
+        tags: ["日式庭園", "牡丹名園", "四季花景"],
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/140426%20Yuushien%20Matsue%20Shimane%20pref%20Japan00b5s3.jpg",
+        imageCredit: "Wikimedia Commons",
+        mapQuery: "Yuushien Garden Matsue Japan",
+        lead: "這是一座把大根島地質、牡丹栽培與日式庭園美學結合得很完整的花園型景點。",
+        fun: "春季牡丹最有名，黃金周附近若花期吻合，芍藥與紫藤也會讓整座園子非常華麗。",
+        scene: "從水景、石組、樹形到花色配置都很細膩，屬於越慢走越能看出層次的庭園。",
+        visit: "四季皆有看點，但若想拍到最飽滿的花景，春末初夏是很受歡迎的時段。",
+        prep: {
+          p1: "由志園不只是賞花庭園，也是大根島地質與地方產業史的縮影。",
+          r: "大根島是玄武岩火山地形，富含礦物質的土壤特別適合高難度牡丹培育。",
+          e: "創辦人門脇榮以 30 年打造園區，讓原本需離鄉販售牡丹的地方產業，成功轉向精緻觀光。",
+          p2: "也因此，由志園同時展現了景觀美學與地方經濟轉型的人文價值。"
+        },
+        infoLink: "https://commons.wikimedia.org/wiki/Category:Yuushien",
+        photoLink: "https://commons.wikimedia.org/wiki/Category:Yuushien"
+      },
+      {
+        no: "05",
+        day: "day34",
+        dayLabel: "第 3-4 天",
+        title: "足立美術館",
+        area: "島根縣安來市",
+        tags: ["日本庭園", "近代美術", "借景美學"],
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Adachi%20Museum%20of%20Art04st3200.jpg",
+        imageCredit: "Wikimedia Commons",
+        mapQuery: "Adachi Museum of Art Shimane Japan",
+        lead: "被譽為「日本最美的美術館」的關鍵，在於它把庭園本身也當成一件會隨季節變化的作品。",
+        fun: "必看「歡迎之窗」與「生之掛軸」，窗框就像畫框，把真實庭園收成一幅動態日本畫。",
+        scene: "枯山水、苔庭、池泉與遠方山景一層層接起來，春夏秋冬各有完全不同的表情。",
+        visit: "館內收藏日本畫、陶藝與雕刻等，也很適合和不特別看畫的人一起參觀。",
+        prep: {
+          p1: "足立美術館把「庭園即繪畫」這件事做到極致。",
+          r: "創辦人足立全康認為，四季的光影與植物生長本身，就能動態表現日本畫的意境。",
+          e: "因此館內特別設計觀景窗口，把外部真景裁切成近似橫山大觀風格的構圖。",
+          p2: "它成功模糊了建築、庭園與架上繪畫之間的界線，是很典型的日本美學實踐。"
+        },
+        infoLink: "https://en.wikipedia.org/wiki/Adachi_Museum_of_Art",
+        photoLink: "https://commons.wikimedia.org/wiki/Category:Adachi_Museum_of_Art"
+      },
+      {
+        no: "06",
+        day: "day34",
+        dayLabel: "第 3-4 天",
+        title: "松江城公園",
+        area: "島根縣松江市",
+        tags: ["國寶天守", "城郭建築", "櫻花名所"],
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Matsue%20Castle.jpg",
+        imageCredit: "Wikimedia Commons",
+        mapQuery: "Matsue Castle Japan",
+        lead: "松江城是山陰地方最具代表性的現存木造天守之一，兼具實戰結構與湖城景觀魅力。",
+        fun: "登上天守可以俯瞰宍道湖與城下町，若在櫻花季前後造訪，氣氛尤其迷人。",
+        scene: "黑色外觀、石垣、護城河與千鳥破風屋頂組合出相當有辨識度的古城輪廓。",
+        visit: "這裡曾是出雲地區政治與經濟中心，也是理解江戶初期築城技術的重要現場。",
+        prep: {
+          p1: "松江城是研究桃山至江戶初期築城技術的國寶級實物。",
+          r: "它保留了防禦型構造、木造天守與當時實戰需求下的結構工法。",
+          e: "內部支柱採包板工法，以鐵帶與木板加固多塊木料，反映當時巨木不足後的工程應對。",
+          p2: "因此松江城不只是景點，也是日本軍事建築史從戰國走向穩定期的技術證據。"
+        },
+        infoLink: "https://en.wikipedia.org/wiki/Matsue_Castle",
+        photoLink: "https://commons.wikimedia.org/wiki/Category:Matsue_Castle"
+      },
+      {
+        no: "07",
+        day: "day34",
+        dayLabel: "第 3-4 天",
+        title: "松江堀川遊覽船",
+        area: "松江城護城河",
+        tags: ["水都體驗", "城下町", "低橋穿越"],
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Matsue%20Horikawa%20Pleasure%20Boat%20ac.jpg",
+        imageCredit: "Wikimedia Commons",
+        mapQuery: "Matsue Horikawa Sightseeing Boat Japan",
+        lead: "若想從另一個角度看松江城與城下町，最有味道的方式就是搭堀川遊覽船慢慢繞一圈。",
+        fun: "通過低橋時船篷會降下，旅客也要一起低頭，是整趟最有記憶點的互動橋段。",
+        scene: "一路會看見水岸石垣、舊街區與樹影倒映，整體氣氛比單純步行更有層次。",
+        visit: "完整水路約 3.7 公里，沿途穿過 16 座橋，是理解松江城市格局很好的方式。",
+        prep: {
+          p1: "堀川水系是松江城下町能長期運作的關鍵基礎設施。",
+          r: "它在江戶時代兼具軍事防禦、物資運輸、蓄水與排水功能，不只是觀光護城河。",
+          e: "現今遊船沿線仍可見武士宅邸石垣與親水台階，保留了當年水都空間的紋理。",
+          p2: "所以這趟船程其實是在移動中閱讀一座江戶城下町的都市結構。"
+        },
+        infoLink: "https://www.matsue-horikawameguri.jp/language/en/",
+        photoLink: "https://commons.wikimedia.org/wiki/Category:Matsue_Horikawa_Pleasure_Boat"
+      },
+      {
+        no: "08",
+        day: "day34",
+        dayLabel: "第 3-4 天",
+        title: "玉作湯神社",
+        area: "玉造溫泉街附近",
+        tags: ["良緣祈願", "勾玉文化", "願石信仰"],
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Tamatsukuriyu%20jinja.jpg",
+        imageCredit: "Wikimedia Commons",
+        mapQuery: "Tamatsukuriyu Shrine Matsue Japan",
+        lead: "玉作湯神社把玉造地區的溫泉文化、勾玉工藝與願望信仰很自然地串在一起。",
+        fun: "最受歡迎的是觸碰許願石與如願石御守的祈願儀式，儀式感很完整。",
+        scene: "神社空間不算張揚，但氣氛安定而神聖，適合在溫泉街散步途中停留。",
+        visit: "主祭神與勾玉製作傳說密切相關，也是玉造地區最具象徵性的信仰中心之一。",
+        prep: {
+          p1: "玉作湯神社見證了出雲地區古代玉石加工文明的繁盛。",
+          r: "附近花仙山曾出產優質青瑪瑙，而主祭神櫛明玉命正是勾玉製作神格的核心。",
+          e: "周邊出土大量古墳時代玉作工坊遺跡、磨石與未完成勾玉，證明這裡確實曾是工藝重鎮。",
+          p2: "這也讓神社成為地方手工業技術被神聖化、文化化的一個具體例子。"
+        },
+        infoLink: "https://www.kankou-shimane.com/en/destinations/9279",
+        photoLink: "https://commons.wikimedia.org/wiki/Category:Tamatsukuriyu-jinja"
+      },
+      {
+        no: "09",
+        day: "day34",
+        dayLabel: "第 3-4 天",
+        title: "玉造溫泉",
+        area: "玉湯川兩岸",
+        tags: ["千年名湯", "美肌溫泉", "溫泉街散步"],
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Tamatsukuri%20Onsen%20Panoramic%20view.JPG",
+        imageCredit: "Wikimedia Commons",
+        mapQuery: "Tamatsukuri Onsen Matsue Japan",
+        lead: "擁有超過千年歷史的玉造溫泉，是結合神話、療養與溫泉街散步氛圍的經典名湯。",
+        fun: "除了泡湯，沿著玉湯川散步、找足湯小歇，也是很舒服的玩法。",
+        scene: "旅館沿河分布，夜晚燈光亮起後很有溫泉鄉氣氛，適合放慢行程節奏。",
+        visit: "《出雲國風土記》早在 733 年就記錄其美肌與療養印象，因此常被稱為神湯。",
+        prep: {
+          p1: "玉造溫泉是日本文獻中最早被明確描述具療養與美容效果的溫泉之一。",
+          r: "泉質為弱鹼性硫酸鹽鹽化物泉，並富含偏矽酸，對肌膚保水與柔軟度很有名。",
+          e: "《出雲國風土記》留下了「洗手一次容貌潤澤，再洗一次萬病皆除」的知名記載。",
+          p2: "因此這裡的溫泉文化，很早就把自然泉質、地方知識與神話療癒觀念結合在一起。"
+        },
+        infoLink: "https://en.wikipedia.org/wiki/Tamatsukuri_Onsen",
+        photoLink: "https://commons.wikimedia.org/wiki/Category:Tamatsukuri_Onsen"
+      },
+      {
+        no: "10",
+        day: "day5",
+        dayLabel: "第 5 天",
+        title: "倉敷美觀地區",
+        area: "岡山縣倉敷市",
+        tags: ["白壁街道", "運河景觀", "歷史街區"],
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kurashiki%20Old%20Town%20039.jpg",
+        imageCredit: "Wikimedia Commons",
+        mapQuery: "Kurashiki Bikan Historical Quarter Japan",
+        lead: "倉敷美觀地區最迷人的地方，在於它不只是保存下來的老街，而是仍然持續被當代藝術與觀光重新使用的歷史空間。",
+        fun: "很適合把時間留給散步，從白壁土藏、柳樹水道，到咖啡館和美術館都值得慢慢停。",
+        scene: "白牆、黑瓦、柳影與水道倒映構成非常經典的倉敷畫面，也是拍照最上相的一段。",
+        visit: "昔日是幕府直轄的重要物資集散地，現在則是歷史街廓與現代文化設施並存的區域。",
+        prep: {
+          p1: "倉敷美觀地區是日本傳統街區保存與都市再生結合得很成功的範例。",
+          r: "江戶時代因倉敷川舟運繁榮，地方富商興建了大量具防火功能的白壁土藏。",
+          e: "進入近代後，大原美術館等西洋美術設施進駐，使江戶街廓與西方藝術產生空間上的對話。",
+          p2: "這讓倉敷不只保留了歷史表面，也創造出持續運作的現代文化價值。"
+        },
+        infoLink: "https://www.japan.travel/en/spot/915/",
+        photoLink: "https://commons.wikimedia.org/wiki/Category:Kurashiki_Bikan_historical_quarter"
+      },
+      {
+        no: "11",
+        day: "day5",
+        dayLabel: "第 5 天",
+        title: "倉敷三井 OUTLET PARK",
+        area: "岡山縣倉敷站前",
+        tags: ["購物休閒", "工業遺產轉型", "站前便利"],
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/MitsuiOutletParkKurashiki002.jpg",
+        imageCredit: "Wikimedia Commons",
+        mapQuery: "Mitsui Outlet Park Kurashiki Japan",
+        lead: "這裡不只是購物點，也很能看出日本城市如何把舊工業用地重新整理成更有機能的生活與觀光空間。",
+        fun: "離倉敷站很近，適合旅程尾聲集中採買，並和美觀地區散步安排在同一天。",
+        scene: "整體空間開放、綠意夠，與鄰近商場和車站動線銜接順暢，逛起來不會太有壓力。",
+        visit: "商場聚集多種品牌，也因地點方便，常被安排成觀光與購物混合型收尾行程。",
+        prep: {
+          p1: "倉敷三井 OUTLET PARK 的價值不只在購物，而在於工業基地再利用的都市策略。",
+          r: "基地原屬倉敷紡織體系，隨產業外移後，地方藉由都市更新把舊工業用地轉為商業與綠地空間。",
+          e: "景觀設計保留既有老樹，也與附近的紅磚建築群形成舊產業與新商業之間的對照。",
+          p2: "它因此成為倉敷把歷史脈絡與當代消費空間接起來的一個具體案例。"
+        },
+        infoLink: "https://mitsui-shopping-park.com/mop/kurashiki/english/index.html?lang=en",
+        photoLink: "https://commons.wikimedia.org/wiki/Category:Mitsui_Outlet_Park_Kurashiki"
+      }
+    ];
+
+    const cardRoot = document.querySelector("#top-spots");
+
+    function mapUrl(query) {
+      return `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=14&output=embed`;
+    }
+
+    function linkUrl(query) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    }
+
+    function renderCards(filter = "all") {
+      const visible = spots.filter((spot) => filter === "all" || spot.day === filter);
+      cardRoot.innerHTML = visible.map((spot) => `
+        <article class="card" data-day="${spot.day}">
+          <div class="card-grid">
+            <div class="visual">
+              <img src="${spot.image}" alt="${spot.title} 照片" loading="lazy" referrerpolicy="no-referrer">
+              <div class="visual-badge">${spot.dayLabel} · ${spot.imageCredit}</div>
+            </div>
+            <div class="content">
+              <div class="title-row">
+                <div>
+                  <div class="meta">
+                    <span>${spot.dayLabel}</span>
+                    <span>${spot.area}</span>
+                  </div>
+                  <h2>${spot.title}</h2>
+                </div>
+                <div class="spot-no">${spot.no}</div>
+              </div>
+
+              <div class="meta">
+                ${spot.tags.map((tag) => `<span>${tag}</span>`).join("")}
+              </div>
+
+              <p class="lead">${spot.lead}</p>
+
+              <div class="highlights">
+                <div>
+                  <strong>參觀亮點</strong>
+                  <span>${spot.visit}</span>
+                </div>
+                <div>
+                  <strong>娛樂度</strong>
+                  <span>${spot.fun}</span>
+                </div>
+                <div>
+                  <strong>景觀感受</strong>
+                  <span>${spot.scene}</span>
+                </div>
+              </div>
+
+              <details>
+                <summary>歷史與人文導覽（PREP）</summary>
+                <div class="prep">
+                  <div><strong>P：</strong>${spot.prep.p1}</div>
+                  <div><strong>R：</strong>${spot.prep.r}</div>
+                  <div><strong>E：</strong>${spot.prep.e}</div>
+                  <div><strong>P：</strong>${spot.prep.p2}</div>
+                </div>
+              </details>
+
+              <iframe
+                class="map-frame"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                src="${mapUrl(spot.mapQuery)}"
+                title="${spot.title} 地圖">
+              </iframe>
+
+              <div class="links">
+                <a href="${linkUrl(spot.mapQuery)}" target="_blank" rel="noreferrer">開啟地圖</a>
+                <a href="${spot.infoLink}" target="_blank" rel="noreferrer">景點資料</a>
+                <a href="${spot.photoLink}" target="_blank" rel="noreferrer">照片來源</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    renderCards();
+
+    document.querySelectorAll(".filters button").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".filters button").forEach((btn) => btn.classList.remove("active"));
+        button.classList.add("active");
+        renderCards(button.dataset.filter);
+      });
+    });
+  </script>
+</body>
+</html>
